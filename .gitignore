@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Node
+node_modules/
+.next/
+.turbo/
+dist/
+build/
+*.tsbuildinfo
+
+# Env
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Supabase
+supabase/.branches/
+supabase/.temp/
+
+# Fly
+.fly/
+
+# Recordings / artifacts (never commit)
+recordings/
+*.wav
+*.mp3
+*.mp4
+!docs/**/*.mp4

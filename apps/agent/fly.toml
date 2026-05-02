@@ -1,0 +1,31 @@
+app = "voxaris-vba-agent"
+primary_region = "iad"
+
+[build]
+
+[env]
+  LOG_LEVEL = "INFO"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512
+
+[[services]]
+  internal_port = 8081
+  protocol = "tcp"
+
+  [[services.ports]]
+    port = 8081
+    handlers = ["tls", "http"]
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+# Long-lived worker — never auto-stop. Cold start kills active calls.
+[[machine]]
+  auto_stop = false
+  auto_start = true
+  min_running = 1

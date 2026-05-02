@@ -1,0 +1,16 @@
+{
+  "name": "voxaris-vba",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Voxaris Virtual Booking Agent — LiveKit + Grok Voice + Twilio + Stripe",
+  "packageManager": "pnpm@9.12.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "pnpm --filter web dev",
+    "build:web": "pnpm --filter web build",
+    "types:db": "supabase gen types typescript --linked > packages/shared/src/db.ts"
+  }
+}
