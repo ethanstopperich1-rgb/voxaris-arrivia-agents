@@ -52,8 +52,8 @@ to book a 90-minute preview tour.
 Identity rules
 - You are an AI. If asked "are you a robot" / "is this AI" / "is this a real
   person" — answer truthfully and immediately: "Yes, I'm an AI assistant.
-  Happy to keep going, or I can transfer you to a human." Never claim to be
-  human. Never evade the question.
+  Happy to keep going, or I can transfer you to a human."
+  Never claim to be human. Never evade the question.
 - You speak on behalf of the resort, not as the resort. Phrasing: "I'm calling
   on behalf of {resort}."
 
@@ -120,27 +120,33 @@ async def entrypoint(ctx: JobContext) -> None:
     logger.info("joining room=%s job_id=%s", ctx.room.name, ctx.job.id)
     await ctx.connect()
 
-    # xAI Realtime API surface (verified against
-    # https://docs.x.ai/developers/model-capabilities/audio/voice-agent):
-    #   - audio formats live under session.audio.{input,output}.format
-    #     as {type: "audio/pcmu", rate: 8000}, NOT flat
-    #     input_audio_format/output_audio_format.
-    #   - turn_detection accepts type, threshold (default 0.85),
-    #     silence_duration_ms, prefix_padding_ms (default 333).
-    #   - Native G.711 μ-law/A-law support means no transcoding from
-    #     Twilio's 8kHz μ-law SIP stream.
-    #
-    # The exact livekit-plugins-xai kwarg names that surface these
-    # need to be confirmed against the installed plugin version (see
-    # `pip show livekit-plugins-xai`). Phase 1 Day 2 PM tunes this.
+    # livekit-plugins-xai 1.5.7 surface (verified by introspection):
+    #   - voice literal is PascalCase: 'Ara' | 'Eve' | 'Leo' | 'Rex' | 'Sal'
+    #     (xAI docs show lowercase but the plugin uses Pascal).
+    #   - turn_detection is openai.types.beta.realtime.TurnDetection
+    #     (TypedDict): type, threshold, silence_duration_ms,
+    #     prefix_padding_ms, eagerness, interrupt_response,
+    #     create_response.
+    #   - NO input_audio_format / output_audio_format kwargs are
+    #     exposed on the constructor or on update_options(). The
+    #     plugin abstracts audio negotiation at the LiveKit pipeline
+    #     level and uses PCM internally, so we lose the μ-law-passthrough
+    #     latency optimization the build plan assumed. Acceptable for
+    #     MVP. If Day 2 PM TTFA stays above 1.5s, options:
+    #     (a) PR livekit-plugins-xai to expose audio config, or
+    #     (b) drop the plugin and write a direct xAI WebSocket client
+    #         per the xai-cookbook telephony example.
     llm = xai.realtime.RealtimeModel(
         model="grok-voice-think-fast-1.0",
-        voice="eve",
+        voice="Eve",
         api_key=os.environ["XAI_API_KEY"],
         turn_detection={
             "type": "server_vad",
             "silence_duration_ms": 600,
         },
+        # Hard cap below xAI's 30-min session limit so we always
+        # close cleanly before the server tears us down.
+        max_session_duration=25 * 60,
     )
 
     session = AgentSession(
@@ -155,7 +161,10 @@ async def entrypoint(ctx: JobContext) -> None:
         agent=VBAQualifierAgent(),
         room=ctx.room,
         room_input_options=RoomInputOptions(
-            noise_cancellation=noise_cancellation.BVC(),
+            # BVCTelephony is tuned for 8kHz / narrowband / SIP audio.
+            # If we ever serve non-telephony rooms (web SDK, mobile),
+            # branch on participant kind and use BVC() instead.
+            noise_cancellation=noise_cancellation.BVCTelephony(),
         ),
     )
 
