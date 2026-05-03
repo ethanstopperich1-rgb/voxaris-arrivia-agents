@@ -27,7 +27,10 @@ from livekit.agents import (
     WorkerOptions,
     cli,
 )
+from livekit.agents.llm import function_tool
 from livekit.plugins import noise_cancellation, silero, xai
+
+from voxaris_agent.objections import match_objection, render_rebuttal
 
 load_dotenv()
 
@@ -158,14 +161,62 @@ def parse_metadata(raw: str | None) -> dict[str, str]:
 
 
 class VBAQualifierAgent(Agent):
-    """Phase 1 placeholder agent — greeting only.
+    """Phase 1 agent — greeting + objection lookup.
 
     Phase 1B will add the qualification state machine.
-    Phase 1C will add the eight `@function_tool` definitions.
+    Phase 1C will add the rest of the eight tools.
     """
 
     def __init__(self, guest_context: dict[str, str] | None = None) -> None:
-        super().__init__(instructions=render_persona(guest_context))
+        self._guest_context = {**DEFAULT_GUEST_CONTEXT, **(guest_context or {})}
+        super().__init__(instructions=render_persona(self._guest_context))
+
+    @function_tool(
+        name="lookup_objection",
+        description=(
+            "Look up the recommended rebuttal for a caller's objection from "
+            "the Top 100 Objections playbook. Call this whenever the caller "
+            "raises hesitation, resistance, or pushback (e.g. about time, "
+            "price, spouse, money, trust, prior bad experience). Returns the "
+            "matched category, the canonical objection, the rebuttal to "
+            "speak, and a confidence score. If no_match is true, improvise "
+            "a warm short response in your own voice and follow with a soft "
+            "trial close."
+        ),
+    )
+    async def lookup_objection(self, objection_text: str) -> dict:
+        """Tool: surface the best-matching rebuttal.
+
+        Args:
+            objection_text: The caller's exact words, paraphrased into a
+                short objection sentence (e.g. "they don't have time",
+                "they think it's all a sales pitch", "spouse isn't here").
+        """
+        matches = match_objection(objection_text)
+        if not matches:
+            return {
+                "no_match": True,
+                "objection_text": objection_text,
+                "guidance": (
+                    "Acknowledge warmly, validate the concern in one short "
+                    "line, then follow with a soft trial close that re-asks "
+                    "for the booking time."
+                ),
+            }
+        m = matches[0]
+        incentive = self._guest_context.get("incentive")
+        return {
+            "no_match": False,
+            "category": m.category,
+            "matched_objection": m.objection,
+            "rebuttal": render_rebuttal(m.rebuttal, incentive),
+            "score": round(m.score, 3),
+            "instruction": (
+                "Speak the rebuttal naturally in your own warm tone. End "
+                "with a soft trial close ('Does morning or afternoon work "
+                "better?')."
+            ),
+        }
 
 
 async def entrypoint(ctx: JobContext) -> None:

@@ -1,0 +1,502 @@
+[
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "We don’t have time.",
+    "rebuttal": "Totally get that—most families don’t. That’s why they keep it tight to about 90 minutes. If I could get you in and out before lunch and still hook you up with [incentive], would that be worth it?"
+  },
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "We’re on vacation—we don’t want to waste time.",
+    "rebuttal": "Exactly why they offer this—so you get something extra out of the trip. Most people trade 90 minutes for a full experience or savings they use the rest of the week."
+  },
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "We’re too busy.",
+    "rebuttal": "What does your schedule look like tomorrow morning vs afternoon?"
+  },
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "We already have plans.",
+    "rebuttal": "No problem—what day are you most flexible?"
+  },
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "We don’t want to sit through a long presentation.",
+    "rebuttal": "It’s actually not a seminar—it’s more of a walkthrough of how people travel smarter."
+  },
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "How long is it really?",
+    "rebuttal": "About 90 minutes—then you’re free to go enjoy your day."
+  },
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "We don’t want to be stuck there.",
+    "rebuttal": "They’re very strict about time—you’re not held hostage."
+  },
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "We’re only here a short time.",
+    "rebuttal": "Perfect—that’s why they prioritize shorter visits like yours."
+  },
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "We just arrived.",
+    "rebuttal": "Great—best time to schedule before your trip fills up."
+  },
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "We’re leaving soon.",
+    "rebuttal": "Let’s lock in something early so you don’t miss out."
+  },
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "We don’t want to commit to a time.",
+    "rebuttal": "Totally fair—morning or afternoon feel better?"
+  },
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "We’re here to relax.",
+    "rebuttal": "Exactly—this helps fund more relaxation."
+  },
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "We don’t want to rush.",
+    "rebuttal": "That’s why we pick a time that fits your pace."
+  },
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "We don’t want to wake up early.",
+    "rebuttal": "Afternoon slots are usually more relaxed anyway."
+  },
+  {
+    "category": "TIME / COMMITMENT",
+    "objection": "We don’t want to plan ahead.",
+    "rebuttal": "Totally—this just holds your spot, you can always adjust."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We don’t want to buy anything.",
+    "rebuttal": "Perfect—this isn’t about buying today."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We’re not interested in timeshare.",
+    "rebuttal": "Most people aren’t—until they see how it actually works now."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We’ve heard bad things.",
+    "rebuttal": "Totally fair—this is more about seeing it for yourself."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We’re just not into that.",
+    "rebuttal": "That’s exactly why they invite people—to show how it’s changed."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We don’t want to be pressured.",
+    "rebuttal": "They actually focus more on education than pressure."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We don’t like sales pitches.",
+    "rebuttal": "Then you’ll like this—it’s more informational."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We’ve done one before.",
+    "rebuttal": "Even better—you’ll notice how different this one is."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We always say no.",
+    "rebuttal": "Perfect—you’re exactly who they expect."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We’re not buyers.",
+    "rebuttal": "No problem—you still qualify for the experience."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We hate being sold to.",
+    "rebuttal": "Same here—this is more of a preview."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We won’t purchase.",
+    "rebuttal": "Totally fine—you still get the benefits."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We don’t want a commitment.",
+    "rebuttal": "No commitment required—just attend."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We’ve been burned before.",
+    "rebuttal": "That’s exactly why it’s worth seeing how it’s evolved."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We don’t trust timeshares.",
+    "rebuttal": "That’s why they let you see it firsthand."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We’ll feel obligated.",
+    "rebuttal": "You’re not—attendance is all that’s required."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We don’t want the pressure after.",
+    "rebuttal": "You’re free to walk away anytime."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We’re not in the market.",
+    "rebuttal": "Most people aren’t—it’s just an opportunity."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We don’t want to deal with it.",
+    "rebuttal": "That’s why they streamline it now."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We don’t like sales environments.",
+    "rebuttal": "It’s more relaxed than you think."
+  },
+  {
+    "category": "SALES RESISTANCE",
+    "objection": "We’ll just say no.",
+    "rebuttal": "Perfect—you’ll still walk away with value."
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "My spouse isn’t here.",
+    "rebuttal": "They’ll need both of you—when are you together?"
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "My spouse wouldn’t want to go.",
+    "rebuttal": "What would they say if there was a benefit tied to it?"
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "We don’t make decisions together.",
+    "rebuttal": "They just require both present—it’s policy."
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "We don’t want to do it together.",
+    "rebuttal": "Totally understand—just a requirement to qualify."
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "We need to ask each other.",
+    "rebuttal": "Of course—what do you think they’d say?"
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "We’ll talk about it later.",
+    "rebuttal": "Let’s pencil something in while it’s available."
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "My partner hates these.",
+    "rebuttal": "Even better—this one might change their mind."
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "We don’t agree on things like this.",
+    "rebuttal": "That’s why they walk you through it together."
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "We’re not on the same page.",
+    "rebuttal": "This helps you get on the same page."
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "We don’t want to argue about it.",
+    "rebuttal": "No pressure to decide anything."
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "We don’t want to sit through it together.",
+    "rebuttal": "That’s actually part of the qualification."
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "We’re independent decision makers.",
+    "rebuttal": "Understood—it’s just their policy."
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "We’re not married.",
+    "rebuttal": "No problem—just need both present if cohabitating."
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "We’ll send one of us.",
+    "rebuttal": "They require both to attend."
+  },
+  {
+    "category": "SPOUSE / DECISION MAKERS",
+    "objection": "We don’t want to coordinate.",
+    "rebuttal": "Let’s find a time that works for both."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We’re just passing through.",
+    "rebuttal": "Perfect—quick stop, big benefit."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We’re here for an event.",
+    "rebuttal": "This fits around your schedule."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We’re traveling with kids.",
+    "rebuttal": "They usually offer accommodations."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We don’t have transportation.",
+    "rebuttal": "They often provide it."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We don’t know the area.",
+    "rebuttal": "They’ll guide you the whole way."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We’re staying off property.",
+    "rebuttal": "That’s actually common."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We’re not local.",
+    "rebuttal": "Even better—you qualify easier."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We’re tourists.",
+    "rebuttal": "That’s who this is for."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We don’t want to leave our hotel.",
+    "rebuttal": "It’s a quick visit, then back to relaxing."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We’re with friends.",
+    "rebuttal": "You can coordinate together."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We’re on a tight itinerary.",
+    "rebuttal": "Let’s fit it into a light window."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We don’t want to travel far.",
+    "rebuttal": "It’s usually nearby."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We don’t have time to get there.",
+    "rebuttal": "Transportation helps solve that."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We don’t want to drive.",
+    "rebuttal": "Shuttles are often available."
+  },
+  {
+    "category": "TRAVEL / SITUATIONAL",
+    "objection": "We’re unfamiliar with the brand.",
+    "rebuttal": "That’s why they invite you."
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We don’t make enough.",
+    "rebuttal": "What range are you in? You might still qualify."
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We don’t have good credit.",
+    "rebuttal": "They just need general eligibility."
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We’re not working right now.",
+    "rebuttal": "Do you have other income sources?"
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We’re retired.",
+    "rebuttal": "That usually qualifies if income is stable."
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We don’t want to share finances.",
+    "rebuttal": "You don’t need to disclose specifics."
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We don’t carry credit cards.",
+    "rebuttal": "They typically require one for check-in."
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We’re budget travelers.",
+    "rebuttal": "This helps stretch your budget."
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We don’t spend much on travel.",
+    "rebuttal": "That’s exactly who benefits most."
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We’re saving money.",
+    "rebuttal": "This is a way to save on future travel."
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We’re not high income.",
+    "rebuttal": "You may still qualify depending on household."
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We don’t want a credit check.",
+    "rebuttal": "No obligation to purchase."
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We don’t want to finance anything.",
+    "rebuttal": "Totally fine—attendance only."
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We’re debt-free.",
+    "rebuttal": "That actually helps your qualification."
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We don’t like payments.",
+    "rebuttal": "No requirement to buy."
+  },
+  {
+    "category": "FINANCIAL / QUALIFICATION",
+    "objection": "We’re not spenders.",
+    "rebuttal": "Even better—you’ll appreciate the savings."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "No thanks.",
+    "rebuttal": "Totally understand—can I ask what you’re most excited about on this trip?"
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "Not interested.",
+    "rebuttal": "What part doesn’t interest you?"
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "Maybe later.",
+    "rebuttal": "Let’s lock something in just in case."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We’ll think about it.",
+    "rebuttal": "What would you need to know to decide?"
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We’re good.",
+    "rebuttal": "Got it—just wanted to offer something extra."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We’re all set.",
+    "rebuttal": "No problem—just curious, do you travel often?"
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We don’t do those.",
+    "rebuttal": "Most people don’t—until they try one."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We’re fine.",
+    "rebuttal": "Totally—this is just a bonus option."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We’re not your target.",
+    "rebuttal": "You might be surprised."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We don’t qualify.",
+    "rebuttal": "Let me check that for you."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We’re not interested in offers.",
+    "rebuttal": "This is more of an experience."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We don’t want anything free.",
+    "rebuttal": "Totally fair—it’s more about value."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We don’t need incentives.",
+    "rebuttal": "This is just an added perk."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We’re independent travelers.",
+    "rebuttal": "Perfect—you’ll appreciate flexibility."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We don’t want obligations.",
+    "rebuttal": "No obligation required."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We don’t want commitments.",
+    "rebuttal": "Just a visit, nothing more."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We don’t like structured things.",
+    "rebuttal": "It’s very casual."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We prefer spontaneity.",
+    "rebuttal": "This doesn’t limit that."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We don’t plan ahead.",
+    "rebuttal": "This just holds an option."
+  },
+  {
+    "category": "GENERAL RESISTANCE / BRUSH-OFFS",
+    "objection": "We’re just browsing.",
+    "rebuttal": "Perfect—this fits that mindset."
+  }
+]

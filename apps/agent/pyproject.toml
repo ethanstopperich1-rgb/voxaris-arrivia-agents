@@ -23,6 +23,9 @@ dev = [
   "pytest>=8.3",
   "pytest-asyncio>=0.24",
   "ruff>=0.7",
+  # python-docx is used by scripts that re-parse the source .docx into
+  # voxaris_agent/data/objections.json. Not required at runtime.
+  "python-docx>=1.1",
 ]
 
 [project.scripts]
@@ -34,6 +37,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["voxaris_agent*"]
+
+[tool.setuptools.package-data]
+"voxaris_agent.data" = ["*.json"]
 
 [tool.ruff]
 line-length = 100
