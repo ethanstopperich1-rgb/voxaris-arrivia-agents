@@ -27,6 +27,7 @@ from livekit.agents import (
     WorkerOptions,
     cli,
 )
+from livekit import api
 from livekit.agents.llm import function_tool
 from livekit.plugins import noise_cancellation, silero, xai
 
@@ -222,19 +223,79 @@ class VBAQualifierAgent(Agent):
 async def entrypoint(ctx: JobContext) -> None:
     """Entrypoint for the named agent dispatch.
 
-    The orchestrator (apps/web `/api/dial`) creates the room, dispatches this
-    agent by name (`vba-qualifier`), and creates a SIP participant. We join
-    the room and wait for the SIP participant before generating the greeting.
+    Recommended LiveKit pattern (per docs/livekit-outbound-calls.md):
+    the orchestrator (apps/web `/api/dial`) only does AgentDispatch with
+    metadata = {"phone_number": "+1...", "resort_name": ..., ...}. The
+    agent itself creates the SIP participant, waits until the callee
+    picks up, then starts the session and speaks the greeting.
+
+    For inbound calls (post-MVP), there's no phone_number in metadata —
+    the SIP participant has already been routed in by a dispatch rule
+    and joined the room before us.
     """
     guest_ctx = parse_metadata(ctx.job.metadata)
+    phone_number = guest_ctx.get("phone_number")
+    is_outbound = phone_number is not None
     logger.info(
-        "joining room=%s job_id=%s resort=%s stay=%s",
+        "joining room=%s job_id=%s direction=%s resort=%s stay=%s",
         ctx.room.name,
         ctx.job.id,
+        "outbound" if is_outbound else "inbound",
         guest_ctx.get("resort_name", DEFAULT_GUEST_CONTEXT["resort_name"]),
         guest_ctx.get("guest_stay_type", DEFAULT_GUEST_CONTEXT["guest_stay_type"]),
     )
     await ctx.connect()
+
+    # ---- OUTBOUND: place the call ourselves and wait for pickup ----
+    sip_participant = None
+    if is_outbound:
+        trunk_id = os.environ.get("LIVEKIT_SIP_OUTBOUND_TRUNK_ID")
+        if not trunk_id:
+            logger.error("LIVEKIT_SIP_OUTBOUND_TRUNK_ID missing — cannot dial")
+            ctx.shutdown()
+            return
+        try:
+            await ctx.api.sip.create_sip_participant(
+                api.CreateSIPParticipantRequest(
+                    room_name=ctx.room.name,
+                    sip_trunk_id=trunk_id,
+                    sip_call_to=phone_number,
+                    participant_identity=phone_number,
+                    participant_name="Caller",
+                    krisp_enabled=True,
+                    # Block until the callee actually picks up. If they
+                    # reject / don't answer / the trunk fails, this
+                    # raises TwirpError with sip_status_code metadata.
+                    wait_until_answered=True,
+                )
+            )
+            logger.info("call answered: %s", phone_number)
+        except api.TwirpError as e:
+            sip_code = e.metadata.get("sip_status_code") if e.metadata else None
+            sip_status = e.metadata.get("sip_status") if e.metadata else None
+            logger.warning(
+                "call did not connect: %s (SIP %s %s)",
+                e.message,
+                sip_code,
+                sip_status,
+            )
+            ctx.shutdown()
+            return
+
+        # Wait for the SIP participant to fully join the room before
+        # starting the session — otherwise the greeting plays before
+        # they're listening.
+        sip_participant = await ctx.wait_for_participant(identity=phone_number)
+
+    # ---- mid-call hangup detection ----
+    @ctx.room.on("participant_disconnected")
+    def _on_disconnect(p) -> None:  # type: ignore[no-untyped-def]
+        # The agent's own identity is server-generated; we only care
+        # about the SIP participant leaving.
+        if sip_participant and p.identity != sip_participant.identity:
+            return
+        reason = getattr(p, "disconnect_reason", None)
+        logger.info("caller disconnected reason=%s", reason)
 
     # livekit-plugins-xai 1.5.7 surface (verified by introspection):
     #   - voice literal is PascalCase: 'Ara' | 'Eve' | 'Leo' | 'Rex' | 'Sal'
@@ -273,17 +334,29 @@ async def entrypoint(ctx: JobContext) -> None:
         vad=silero.VAD.load(),
     )
 
-    await session.start(
-        agent=VBAQualifierAgent(guest_context=guest_ctx),
-        room=ctx.room,
-        room_input_options=RoomInputOptions(
+    start_kwargs: dict = {
+        "agent": VBAQualifierAgent(guest_context=guest_ctx),
+        "room": ctx.room,
+        "room_input_options": RoomInputOptions(
             # BVCTelephony is tuned for 8kHz / narrowband / SIP audio.
             # If we ever serve non-telephony rooms (web SDK, mobile),
             # branch on participant kind and use BVC() instead.
             noise_cancellation=noise_cancellation.BVCTelephony(),
         ),
-    )
+    }
+    # For outbound, bind the session to the SIP participant we just
+    # added so audio flows directly to/from them. For inbound, the
+    # SIP participant is in the room already (added by the dispatch
+    # rule); session picks them up automatically.
+    if sip_participant is not None:
+        start_kwargs["participant"] = sip_participant
 
+    await session.start(**start_kwargs)
+
+    # Speak first AFTER the callee is in the room. For outbound, this
+    # avoids the "greeting plays into ringback" trap. The caller
+    # consented to an AI call on the QR page and is expecting the
+    # disclosure in the first 10 seconds (FCC PEWC requirement).
     await session.generate_reply(instructions=render_greeting(guest_ctx))
 
 

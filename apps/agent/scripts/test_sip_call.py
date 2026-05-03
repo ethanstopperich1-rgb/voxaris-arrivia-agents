@@ -1,10 +1,15 @@
-"""Place a test outbound call from LiveKit through the Twilio SIP trunk
-and dispatch the `vba-qualifier` agent into the room to greet the caller.
+"""Place a test outbound call by dispatching the agent.
+
+The agent's entrypoint reads phone_number + guest context from job
+metadata, creates the SIP participant via the Twilio trunk, waits for
+pickup, then starts the session and speaks the greeting. This matches
+the LiveKit-recommended outbound pattern (see
+docs/livekit/outbound-calls.md) — the orchestrator only dispatches.
 
 PREREQUISITES
 - `python -m scripts.setup_sip` has been run (creates the SIP trunk)
 - The agent worker is running: `python -m voxaris_agent.worker dev`
-  (in another shell — it must be registered before we dispatch)
+  (in another shell — must be registered before we dispatch)
 
 Usage:
     python -m scripts.test_sip_call --to '+1XXXXXXXXXX'
@@ -39,12 +44,22 @@ async def place_call(
     if not E164.fullmatch(to):
         sys.exit(f"--to must be E.164, got: {to!r}")
 
-    trunk_id = os.environ.get("LIVEKIT_SIP_OUTBOUND_TRUNK_ID")
-    if not trunk_id:
+    if not os.environ.get("LIVEKIT_SIP_OUTBOUND_TRUNK_ID"):
         sys.exit("LIVEKIT_SIP_OUTBOUND_TRUNK_ID missing — run setup_sip first")
 
     room_name = f"vba-test-{secrets.token_hex(4)}"
     consent_id = secrets.token_hex(8)
+
+    metadata = json.dumps(
+        {
+            "phone_number": to,
+            "consent_id": consent_id,
+            "resort_name": resort_name,
+            "incentive": incentive,
+            "guest_stay_type": guest_stay_type,
+            "placement_location": placement_location,
+        }
+    )
 
     lk = api.LiveKitAPI(
         url=os.environ["LIVEKIT_URL"],
@@ -52,23 +67,6 @@ async def place_call(
         api_secret=os.environ["LIVEKIT_API_SECRET"],
     )
     try:
-        # 1. Create the room (eager, so dispatch finds it).
-        await lk.room.create_room(
-            api.CreateRoomRequest(name=room_name, empty_timeout=120),
-        )
-        print(f"  room: {room_name}")
-
-        # 2. Dispatch the vba-qualifier agent into the room.
-        metadata = json.dumps(
-            {
-                "consent_id": consent_id,
-                "phone_e164": to,
-                "resort_name": resort_name,
-                "incentive": incentive,
-                "guest_stay_type": guest_stay_type,
-                "placement_location": placement_location,
-            }
-        )
         dispatch = await lk.agent_dispatch.create_dispatch(
             api.CreateAgentDispatchRequest(
                 agent_name="vba-qualifier",
@@ -76,25 +74,12 @@ async def place_call(
                 metadata=metadata,
             )
         )
-        print(f"  agent dispatched: {dispatch.id}")
-
-        # 3. Create the SIP participant — Twilio dials the PSTN.
-        sip = await lk.sip.create_sip_participant(
-            api.CreateSIPParticipantRequest(
-                sip_trunk_id=trunk_id,
-                sip_call_to=to,
-                room_name=room_name,
-                participant_identity="caller",
-                participant_name="Test Caller",
-                krisp_enabled=True,
-                wait_until_answered=True,
-            )
-        )
-        print(f"  SIP participant: {sip.participant_id}")
-        print(f"  call placed to {to} — answer your phone")
+        print(f"  dispatched: {dispatch.id}")
+        print(f"  room:       {room_name}")
+        print(f"  dialing:    {to}")
         print()
-        print(f"  watch worker logs for greeting + transcription")
-        print(f"  (room {room_name} auto-cleans after 120s empty)")
+        print("  watch worker logs — agent creates the SIP participant,")
+        print("  waits until you answer, then speaks the greeting.")
     finally:
         await lk.aclose()
 
