@@ -67,19 +67,35 @@ async def place_call(
         api_secret=os.environ["LIVEKIT_API_SECRET"],
     )
     try:
-        dispatch = await lk.agent_dispatch.create_dispatch(
-            api.CreateAgentDispatchRequest(
-                agent_name="vba-qualifier",
-                room=room_name,
+        # 1. Pre-create the room.
+        await lk.room.create_room(
+            api.CreateRoomRequest(
+                name=room_name,
+                empty_timeout=120,
+                # Pass guest context as room metadata so the auto-
+                # dispatched agent can read it from ctx.room.metadata.
                 metadata=metadata,
+            ),
+        )
+        print(f"  room:       {room_name}")
+
+        # 2. Create the SIP participant. The agent worker is in
+        # auto-dispatch mode — it joins every new room automatically,
+        # no AgentDispatch needed.
+        trunk_id = os.environ["LIVEKIT_SIP_OUTBOUND_TRUNK_ID"]
+        sip = await lk.sip.create_sip_participant(
+            api.CreateSIPParticipantRequest(
+                sip_trunk_id=trunk_id,
+                sip_call_to=to,
+                room_name=room_name,
+                participant_identity=to,
+                participant_name="Caller",
+                krisp_enabled=True,
+                wait_until_answered=False,
             )
         )
-        print(f"  dispatched: {dispatch.id}")
-        print(f"  room:       {room_name}")
-        print(f"  dialing:    {to}")
-        print()
-        print("  watch worker logs — agent creates the SIP participant,")
-        print("  waits until you answer, then speaks the greeting.")
+        print(f"  SIP call:   {sip.sip_call_id}")
+        print(f"  dialing:    {to} — answer your phone")
     finally:
         await lk.aclose()
 

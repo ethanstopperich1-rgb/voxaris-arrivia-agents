@@ -29,7 +29,7 @@ from livekit.agents import (
 )
 from livekit import api
 from livekit.agents.llm import function_tool
-from livekit.plugins import noise_cancellation, silero, xai
+from livekit.plugins import deepgram, noise_cancellation, openai, rime, silero
 
 from voxaris_agent.objections import match_objection, render_rebuttal
 
@@ -334,59 +334,35 @@ async def entrypoint(ctx: JobContext) -> None:
     the SIP participant has already been routed in by a dispatch rule
     and joined the room before us.
     """
+    # Read guest context from job metadata (named-dispatch path) OR
+    # room metadata (auto-dispatch path). Either works.
+    await ctx.connect()
     guest_ctx = parse_metadata(ctx.job.metadata)
+    if not guest_ctx and ctx.room.metadata:
+        guest_ctx = parse_metadata(ctx.room.metadata)
     phone_number = guest_ctx.get("phone_number")
-    is_outbound = phone_number is not None
     logger.info(
-        "joining room=%s job_id=%s direction=%s resort=%s stay=%s",
+        "joining room=%s job_id=%s phone=%s resort=%s",
         ctx.room.name,
         ctx.job.id,
-        "outbound" if is_outbound else "inbound",
+        phone_number or "<auto-dispatch>",
         guest_ctx.get("resort_name", DEFAULT_GUEST_CONTEXT["resort_name"]),
-        guest_ctx.get("guest_stay_type", DEFAULT_GUEST_CONTEXT["guest_stay_type"]),
     )
-    await ctx.connect()
 
-    # ---- OUTBOUND: place the call ourselves and wait for pickup ----
-    sip_participant = None
-    if is_outbound:
-        trunk_id = os.environ.get("LIVEKIT_SIP_OUTBOUND_TRUNK_ID")
-        if not trunk_id:
-            logger.error("LIVEKIT_SIP_OUTBOUND_TRUNK_ID missing — cannot dial")
-            ctx.shutdown()
-            return
-        try:
-            await ctx.api.sip.create_sip_participant(
-                api.CreateSIPParticipantRequest(
-                    room_name=ctx.room.name,
-                    sip_trunk_id=trunk_id,
-                    sip_call_to=phone_number,
-                    participant_identity=phone_number,
-                    participant_name="Caller",
-                    krisp_enabled=True,
-                    # Block until the callee actually picks up. If they
-                    # reject / don't answer / the trunk fails, this
-                    # raises TwirpError with sip_status_code metadata.
-                    wait_until_answered=True,
-                )
-            )
-            logger.info("call answered: %s", phone_number)
-        except api.TwirpError as e:
-            sip_code = e.metadata.get("sip_status_code") if e.metadata else None
-            sip_status = e.metadata.get("sip_status") if e.metadata else None
-            logger.warning(
-                "call did not connect: %s (SIP %s %s)",
-                e.message,
-                sip_code,
-                sip_status,
-            )
-            ctx.shutdown()
-            return
-
-        # Wait for the SIP participant to fully join the room before
-        # starting the session — otherwise the greeting plays before
-        # they're listening.
-        sip_participant = await ctx.wait_for_participant(identity=phone_number)
+    # Wait for the SIP participant to join the room. The orchestrator
+    # creates the SIP participant in the same room as our agent. Auto-
+    # dispatch means we may join the room slightly before or after the
+    # SIP participant — wait_for_participant handles both.
+    try:
+        if phone_number:
+            sip_participant = await ctx.wait_for_participant(identity=phone_number)
+        else:
+            sip_participant = await ctx.wait_for_participant()
+        logger.info("participant joined: identity=%s", sip_participant.identity)
+    except Exception as e:
+        logger.warning("never saw participant: %s", e)
+        ctx.shutdown()
+        return
 
     # ---- mid-call hangup detection ----
     @ctx.room.on("participant_disconnected")
@@ -398,61 +374,69 @@ async def entrypoint(ctx: JobContext) -> None:
         reason = getattr(p, "disconnect_reason", None)
         logger.info("caller disconnected reason=%s", reason)
 
-    # livekit-plugins-xai 1.5.7 surface (verified by introspection):
-    #   - voice literal is PascalCase: 'Ara' | 'Eve' | 'Leo' | 'Rex' | 'Sal'
-    #     (xAI docs show lowercase but the plugin uses Pascal).
-    #   - turn_detection is openai.types.beta.realtime.TurnDetection
-    #     (TypedDict): type, threshold, silence_duration_ms,
-    #     prefix_padding_ms, eagerness, interrupt_response,
-    #     create_response.
-    #   - NO input_audio_format / output_audio_format kwargs are
-    #     exposed on the constructor or on update_options(). The
-    #     plugin abstracts audio negotiation at the LiveKit pipeline
-    #     level and uses PCM internally, so we lose the μ-law-passthrough
-    #     latency optimization the build plan assumed. Acceptable for
-    #     MVP. If Day 2 PM TTFA stays above 1.5s, options:
-    #     (a) PR livekit-plugins-xai to expose audio config, or
-    #     (b) drop the plugin and write a direct xAI WebSocket client
-    #         per the xai-cookbook telephony example.
-    llm = xai.realtime.RealtimeModel(
-        model="grok-voice-think-fast-1.0",
-        voice="Eve",
+    # STT-LLM-TTS pipeline (replaces xAI realtime model — robotic voice
+    # was the trigger for this pivot).
+    #
+    #   STT: Deepgram Nova-3       — fastest, ~150ms transcription
+    #   LLM: Grok-4-fast (non-reasoning) via OpenAI-compatible endpoint
+    #   TTS: Rime Arcana           — natural-sounding, telephony-grade
+    #   VAD: Silero                 — drives turn-taking + barge-in
+    #
+    # TTFA budget: ~800–1200ms (vs ~600ms for the realtime model).
+    # The latency hit buys dramatically more natural voice quality
+    # and ~30–40% lower per-minute cost.
+    stt = deepgram.STT(
+        model="nova-3",
+        language="en-US",
+        # Tighter endpointing for snappier turn-taking on the SIP edge.
+        endpointing_ms=25,
+        smart_format=True,
+        # Filler words help the LLM read natural speech ("um, yeah").
+        filler_words=True,
+    )
+
+    llm = openai.LLM.with_x_ai(
+        model="grok-4-fast-non-reasoning",
         api_key=os.environ["XAI_API_KEY"],
-        turn_detection={
-            "type": "server_vad",
-            "silence_duration_ms": 600,
-        },
-        # Hard cap below xAI's 30-min session limit so we always
-        # close cleanly before the server tears us down.
-        max_session_duration=25 * 60,
+        # Lower temperature keeps Deedy on-script. The persona already
+        # shapes tone; we don't want creative riffing during a
+        # qualification call.
+        temperature=0.4,
+        parallel_tool_calls=False,
+    )
+
+    tts = rime.TTS(
+        model="arcana",
+        # Luna = warm, friendly female — matches Deedy's concierge
+        # persona. Other Arcana options if Luna doesn't land:
+        # 'celeste' (calmer), 'sage' (older), 'hank' (male alt).
+        speaker="luna",
+        lang="eng",
+        # Telephony narrowband — agent + Twilio both 8kHz μ-law.
+        sample_rate=22050,  # Rime resamples; 22050 is a good middle ground
+        reduce_latency=True,
+        api_key=os.environ.get("RIME_API_KEY"),
     )
 
     session = AgentSession(
+        stt=stt,
         llm=llm,
-        # Silero gives us a room-level "user is speaking" indicator on
-        # the dashboard; xAI server VAD still drives turn-taking inside
-        # the realtime session.
+        tts=tts,
         vad=silero.VAD.load(),
     )
 
-    start_kwargs: dict = {
-        "agent": VBAQualifierAgent(guest_context=guest_ctx),
-        "room": ctx.room,
-        "room_input_options": RoomInputOptions(
-            # BVCTelephony is tuned for 8kHz / narrowband / SIP audio.
-            # If we ever serve non-telephony rooms (web SDK, mobile),
-            # branch on participant kind and use BVC() instead.
+    # AgentSession.start() in livekit-agents 1.5.7 does NOT accept a
+    # `participant=` kwarg — the session picks up audio from whoever
+    # is in the room. The participant we just waited for is now
+    # speaking into the same room as us, so this just works.
+    await session.start(
+        agent=VBAQualifierAgent(guest_context=guest_ctx),
+        room=ctx.room,
+        room_input_options=RoomInputOptions(
+            # BVCTelephony tuned for 8kHz/narrowband SIP audio.
             noise_cancellation=noise_cancellation.BVCTelephony(),
         ),
-    }
-    # For outbound, bind the session to the SIP participant we just
-    # added so audio flows directly to/from them. For inbound, the
-    # SIP participant is in the room already (added by the dispatch
-    # rule); session picks them up automatically.
-    if sip_participant is not None:
-        start_kwargs["participant"] = sip_participant
-
-    await session.start(**start_kwargs)
+    )
 
     # Speak first AFTER the callee is in the room. For outbound, this
     # avoids the "greeting plays into ringback" trap. The caller
@@ -462,16 +446,24 @@ async def entrypoint(ctx: JobContext) -> None:
 
 
 def cli_main() -> None:
-    """Console entrypoint exposed as `vba-worker`."""
-    agents.cli.run_app(
-        WorkerOptions(
-            entrypoint_fnc=entrypoint,
-            # Named-agent dispatch only. Web orchestrator must explicitly
-            # dispatch via AgentDispatchClient — no auto-dispatch on room
-            # creation.
-            agent_name="vba-qualifier",
-        )
-    )
+    """Console entrypoint exposed as `vba-worker`.
+
+    NOTE: agent_name is intentionally OMITTED. With agent_name set, the
+    worker only accepts named-dispatch jobs (AgentDispatchClient). On
+    LiveKit Cloud, named dispatch routing has been unreliable in our
+    setup — dispatches show in `lk dispatch list` but never arrive at
+    the worker, leaving the SIP participant in an empty room.
+
+    Without agent_name, the worker AUTO-DISPATCHES into every new room.
+    The orchestrator only needs to create the SIP participant; the
+    agent joins automatically. This is the documented LiveKit pattern
+    for single-agent deployments.
+
+    For Phase 2 multi-tenant routing, switch back to named dispatch
+    once we figure out why routing fails (likely stale ghost workers
+    in LiveKit Cloud's routing table — fresh project should fix).
+    """
+    agents.cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint))
 
 
 # Alias so `python -m voxaris_agent.worker` works as well as the script.
