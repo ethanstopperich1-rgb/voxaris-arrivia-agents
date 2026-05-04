@@ -1,0 +1,131 @@
+# Render Blueprint — Voxaris voice agents (Deedy + Andie)
+#
+# Connect this repo to Render → "New +" → "Blueprint" → select this
+# repo → Render reads render.yaml and provisions both services. Each
+# is a private background worker (no inbound HTTP traffic — they
+# register over outbound WebSocket to wss://*.livekit.cloud and pull
+# jobs from there).
+#
+# Each service has its own `dockerfilePath` rooted at its app dir so
+# the build context is the right monorepo subtree, and so the COPY
+# commands in each Dockerfile resolve correctly against
+# `apps/agent/voxaris_agent/` and `apps/andie/voxaris_andie/`.
+#
+# Env vars are declared as `sync: false` — we DO NOT commit the
+# values. Set them once in the Render dashboard for each service
+# (or use `render env push` from the CLI). The full list per service
+# is in apps/<agent>/.env.example. Required for the call to actually
+# place audio:
+#   - LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET
+#   - DEEPGRAM_API_KEY, RIME_API_KEY, XAI_API_KEY
+#   - LIVEKIT_SIP_OUTBOUND_TRUNK_ID, TWILIO_VOICE_NUMBER
+#   - APP_API_KEY (telemetry POST → arrivia.voxaris.io/api/agent/events)
+#   - LIVEKIT_PHONE_NUMBER (per-agent: +14072586810 deedy, +16892608790 andie)
+#
+# Plan: `starter` ($7/mo each, 0.5 CPU / 512MB RAM) is plenty for a
+# single concurrent call; bump to `standard` if you push past 5
+# concurrent calls per agent.
+
+services:
+  - type: worker
+    name: voxaris-deedy
+    runtime: docker
+    plan: starter
+    region: virginia                      # us-east → matches LK us-east SIP
+    rootDir: apps/agent
+    dockerfilePath: ./Dockerfile
+    branch: main
+    autoDeploy: true                      # redeploy on every push to main
+    envVars:
+      # All values set in Render dashboard, never committed
+      - key: LIVEKIT_URL
+        sync: false
+      - key: LIVEKIT_API_KEY
+        sync: false
+      - key: LIVEKIT_API_SECRET
+        sync: false
+      - key: LIVEKIT_PHONE_NUMBER
+        value: "+14072586810"             # Deedy public inbound number
+      - key: LIVEKIT_SIP_OUTBOUND_TRUNK_ID
+        sync: false
+      - key: DEEPGRAM_API_KEY
+        sync: false
+      - key: RIME_API_KEY
+        sync: false
+      - key: XAI_API_KEY
+        sync: false
+      - key: APP_API_KEY
+        sync: false
+      - key: AGENT_EVENTS_URL
+        value: https://arrivia.voxaris.io/api/agent/events
+      - key: TWILIO_VOICE_NUMBER
+        sync: false
+      - key: TWILIO_TRUNK_DOMAIN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: OPC_BOOK_URL
+        value: https://arrivia.voxaris.io/api/tools/opc-book
+      - key: OPC_BOOK_API_KEY
+        sync: false
+      - key: SENDBLUE_API_KEY_ID
+        sync: false
+      - key: SENDBLUE_API_SECRET_KEY
+        sync: false
+      - key: SENDBLUE_FROM_NUMBER
+        sync: false
+      - key: SPECIALIST_PHONE
+        sync: false
+      - key: LIVE_AGENT_NUMBER
+        sync: false
+      - key: LOG_LEVEL
+        value: INFO
+
+  - type: worker
+    name: voxaris-andie
+    runtime: docker
+    plan: starter
+    region: virginia
+    rootDir: apps/andie
+    dockerfilePath: ./Dockerfile
+    branch: main
+    autoDeploy: true
+    envVars:
+      - key: LIVEKIT_URL
+        sync: false
+      - key: LIVEKIT_API_KEY
+        sync: false
+      - key: LIVEKIT_API_SECRET
+        sync: false
+      - key: LIVEKIT_PHONE_NUMBER
+        value: "+16892608790"             # Andie public inbound number
+      - key: LIVEKIT_SIP_OUTBOUND_TRUNK_ID
+        sync: false
+      - key: DEEPGRAM_API_KEY
+        sync: false
+      - key: RIME_API_KEY
+        sync: false
+      - key: XAI_API_KEY
+        sync: false
+      - key: APP_API_KEY
+        sync: false
+      - key: ARRIVIA_GVR_API_KEY
+        sync: false
+      - key: AGENT_EVENTS_URL
+        value: https://arrivia.voxaris.io/api/agent/events
+      - key: TWILIO_VOICE_NUMBER
+        sync: false
+      - key: TWILIO_TRUNK_DOMAIN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SPECIALIST_PHONE
+        sync: false
+      - key: LIVE_AGENT_NUMBER
+        sync: false
+      - key: LOG_LEVEL
+        value: INFO
