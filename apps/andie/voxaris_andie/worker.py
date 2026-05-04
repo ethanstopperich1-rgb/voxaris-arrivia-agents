@@ -214,7 +214,8 @@ async def _generate_call_summary(session, room_name: str, member_ctx: dict) -> N
             "Summarize this GVR member voice call in 2-3 sentences. Then "
             "on a new line write OUTCOME: <one of "
             "transferred|scheduler-link|not-interested|no-show-risk|"
-            "completed|voicemail>. Be terse."
+            "completed|voicemail|dnc|wrong-person|not-eligible|"
+            "recording-or-ai-objection|language-mismatch>. Be terse."
         )
         from livekit.agents.llm import ChatContext
         ctx_one = ChatContext()
@@ -234,11 +235,18 @@ async def _generate_call_summary(session, room_name: str, member_ctx: dict) -> N
         if not full:
             return
 
+        VALID_OUTCOMES = {
+            "transferred", "scheduler-link", "not-interested",
+            "no-show-risk", "completed", "voicemail", "dnc",
+            "wrong-person", "not-eligible", "recording-or-ai-objection",
+            "language-mismatch",
+        }
         outcome = "completed"
         summary_text = full
         for line in full.splitlines()[::-1]:
             if line.upper().startswith("OUTCOME:"):
-                outcome = line.split(":", 1)[1].strip().lower()
+                raw = line.split(":", 1)[1].strip().lower()
+                outcome = raw if raw in VALID_OUTCOMES else "completed"
                 summary_text = full.replace(line, "").strip()
                 break
 
@@ -254,6 +262,42 @@ async def _generate_call_summary(session, room_name: str, member_ctx: dict) -> N
         )
     except Exception as e:  # noqa: BLE001
         logger.warning("summary generation failed: %s", e)
+
+
+_SENSITIVE_TOOL_ARG_KEYS: frozenset[str] = frozenset(
+    {
+        "caller_phone",
+        "to_phone",
+        "phone",
+        "phone_number",
+        "destination",
+        "credit_card",
+        "cvv",
+        "ssn",
+        "email",
+        "card_number",
+    }
+)
+
+
+def _redact_args(kwargs: dict) -> dict:
+    out: dict = {}
+    for k, v in kwargs.items():
+        if k in _SENSITIVE_TOOL_ARG_KEYS:
+            out[k] = "***"
+        else:
+            out[k] = str(v)[:80]
+    return out
+
+
+def _truncate_at_word(text: str, limit: int) -> str:
+    """Word-boundary truncation so warm-handoff briefs never end mid-word."""
+    s = (text or "").strip()
+    if len(s) <= limit:
+        return s
+    head = s[:limit]
+    cut = head.rsplit(" ", 1)[0]
+    return (cut or head).rstrip(",.; ") + "…"
 
 
 def _instrument_tool(tool_name: str):
@@ -290,7 +334,7 @@ def _instrument_tool(tool_name: str):
                             "duration_ms": dt_ms,
                             "success": success,
                             "error": err_str,
-                            "args_preview": {k: str(v)[:80] for k, v in kwargs.items()},
+                            "args_preview": _redact_args(kwargs),
                         },
                     )
                 except Exception:
@@ -347,7 +391,8 @@ GREETING_INSTRUCTIONS_OUTBOUND_TEMPLATE = (
     "\"Hi {member_name}, this is Andee with Government Vacation "
     "Rewards. I'm a virtual benefits guide and this call may be "
     "recorded. The reason I'm reaching out — we loaded "
-    "{incentive_amount} of cash credits into your travel account "
+    "{incentive_amount} in cash credits in your "
+    "travel account "
     "when you enrolled, and I'd love to walk you through how to "
     "actually use them. Got a quick minute?\" "
     "Then wait for their answer. Be ready for: yes (engaged) → "
@@ -1122,7 +1167,7 @@ class AndieAgent(Agent):
             member_name = self._member_context.get("member_name", "this member")
             handoff_line = (
                 f"Hi, this is Andee — connecting you with {member_name}. "
-                f"Quick brief: {brief[:200] if brief else reason}. "
+                f"Quick brief: {_truncate_at_word(brief, 200) if brief else reason}. "
                 f"I'll let you two take it from here."
             )
             await session.say(handoff_line, allow_interruptions=False)
@@ -1341,12 +1386,21 @@ async def entrypoint(ctx: JobContext) -> None:
     # Recording is fire-and-forget — never blocks session.start().
     _start_room_recording_in_background(ctx)
 
+    # Pin input to the SIP caller (see Deedy worker for full rationale).
+    room_input = RoomInputOptions(
+        noise_cancellation=noise_cancellation.BVCTelephony(),
+    )
+    if sip_participant is not None:
+        room_input = RoomInputOptions(
+            noise_cancellation=noise_cancellation.BVCTelephony(),
+            participant_identity=sip_participant.identity,
+            participant_kinds=[rtc.ParticipantKind.PARTICIPANT_KIND_SIP],
+        )
+
     await session.start(
         agent=AndieAgent(member_context=member_ctx),
         room=ctx.room,
-        room_input_options=RoomInputOptions(
-            noise_cancellation=noise_cancellation.BVCTelephony(),
-        ),
+        room_input_options=room_input,
     )
 
     await session.generate_reply(instructions=render_greeting(member_ctx))

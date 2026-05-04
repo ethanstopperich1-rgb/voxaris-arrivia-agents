@@ -220,8 +220,10 @@ async def _generate_call_summary(session, room_name: str, guest_ctx: dict) -> No
         instructions = (
             "Summarize this voice agent call in 2-3 sentences. Then on a "
             "new line write OUTCOME: <one of "
-            "booked|no-show-risk|transferred|scheduler-link|not-interested|"
-            "completed|voicemail>. Be terse."
+            "booked|no-show-risk|transferred|scheduler-link|"
+            "not-interested|completed|voicemail|dnc|not-eligible|"
+            "deposit-refused|booking-failed|wrong-number|"
+            "recording-or-ai-objection|language-mismatch>. Be terse."
         )
         # Use the session's LLM (already wrapped in FallbackAdapter).
         from livekit.agents.llm import ChatContext
@@ -242,12 +244,22 @@ async def _generate_call_summary(session, room_name: str, guest_ctx: dict) -> No
         if not full:
             return
 
-        # Parse summary + outcome
+        # Parse summary + outcome. If the LLM hallucinates an unknown
+        # outcome or omits the OUTCOME line, fall back to "completed"
+        # so the dashboard never silently shows nonsense.
+        VALID_OUTCOMES = {
+            "booked", "no-show-risk", "transferred", "scheduler-link",
+            "not-interested", "completed", "voicemail", "dnc",
+            "not-eligible", "deposit-refused", "booking-failed",
+            "wrong-number", "recording-or-ai-objection",
+            "language-mismatch",
+        }
         outcome = "completed"
         summary_text = full
         for line in full.splitlines()[::-1]:
             if line.upper().startswith("OUTCOME:"):
-                outcome = line.split(":", 1)[1].strip().lower()
+                raw = line.split(":", 1)[1].strip().lower()
+                outcome = raw if raw in VALID_OUTCOMES else "completed"
                 summary_text = full.replace(line, "").strip()
                 break
 
@@ -264,6 +276,49 @@ async def _generate_call_summary(session, room_name: str, guest_ctx: dict) -> No
         )
     except Exception as e:  # noqa: BLE001
         logger.warning("summary generation failed: %s", e)
+
+
+# Keys whose values must NEVER land in `tool_invocation.args_preview` —
+# they may flow into Supabase agent_events otherwise. Phone numbers are
+# already masked in the dashboard table; this keeps the raw audit log
+# consistent. Add new sensitive kwargs here as tools evolve.
+_SENSITIVE_TOOL_ARG_KEYS: frozenset[str] = frozenset(
+    {
+        "caller_phone",
+        "to_phone",
+        "phone",
+        "phone_number",
+        "destination",         # send_scheduler_link uses this for sms/email
+        "credit_card",
+        "cvv",
+        "ssn",
+        "email",
+        "card_number",
+    }
+)
+
+
+def _redact_args(kwargs: dict) -> dict:
+    """Strip sensitive values before they hit telemetry."""
+    out: dict = {}
+    for k, v in kwargs.items():
+        if k in _SENSITIVE_TOOL_ARG_KEYS:
+            out[k] = "***"
+        else:
+            out[k] = str(v)[:80]
+    return out
+
+
+def _truncate_at_word(text: str, limit: int) -> str:
+    """Truncate at a word boundary so warm-handoff briefs don't end
+    mid-word when the LLM passes a long string. Falls back to hard
+    truncation if the text has no whitespace within the window."""
+    s = (text or "").strip()
+    if len(s) <= limit:
+        return s
+    head = s[:limit]
+    cut = head.rsplit(" ", 1)[0]
+    return (cut or head).rstrip(",.; ") + "…"
 
 
 def _instrument_tool(tool_name: str):
@@ -305,7 +360,7 @@ def _instrument_tool(tool_name: str):
                             "duration_ms": dt_ms,
                             "success": success,
                             "error": err_str,
-                            "args_preview": {k: str(v)[:80] for k, v in kwargs.items()},
+                            "args_preview": _redact_args(kwargs),
                         },
                     )
                 except Exception:
@@ -1178,7 +1233,7 @@ class VBAQualifierAgent(Agent):
             f"Arrive about 15 minutes early — bring a photo ID and the "
             f"credit card you use when you travel. Plan for about 90 "
             f"minutes. Once you complete the full preview, your "
-            f"{offer} unlock. "
+            f"{offer} unlocks. "
             f"{deposit_line} "
             f"— Deedy at {property_name}"
         )
@@ -1227,13 +1282,16 @@ class VBAQualifierAgent(Agent):
         """Marks the call as voicemail in logs. Agent then leaves a
         short message and hangs up."""
         logger.info("detect_voicemail: agent classified the line as voicemail")
+        # Render the property name from guest context — never let the
+        # raw `{property_name}` template literal reach the LLM.
+        prop = self._guest_context.get("property_name", "the resort")
         return {
             "is_voicemail": True,
             "instruction": (
-                "Leave a 5-second message: 'Hi, this is Deedy from {property_name} "
-                "Lakes — I'll text you a link to reschedule.' Then call "
-                "hangup_call with reason='voicemail'. Do NOT run the "
-                "qualification flow against a voicemail box."
+                f"Leave a 5-second message: 'Hi, this is Deedy from "
+                f"{prop} — I'll text you a link to reschedule.' Then "
+                f"call hangup_call with reason='voicemail'. Do NOT run "
+                f"the qualification flow against a voicemail box."
             ),
         }
 
@@ -1499,7 +1557,7 @@ class VBAQualifierAgent(Agent):
             caller_name = self._guest_context.get("caller_name", "the guest")
             handoff_line = (
                 f"Hi, this is Deedee — connecting you with {caller_name}. "
-                f"Quick brief: {brief[:200] if brief else reason}. "
+                f"Quick brief: {_truncate_at_word(brief, 200) if brief else reason}. "
                 f"I'll let you take it from here."
             )
             await session.say(handoff_line, allow_interruptions=False)
@@ -1821,13 +1879,26 @@ async def entrypoint(ctx: JobContext) -> None:
     # No-op unless RECORDING_ENABLED=1 + storage config set on the agent.
     _start_room_recording_in_background(ctx)
 
+    # Pin audio input to the SIP caller specifically. Without this,
+    # `session.start()` picks up "whoever is in the room" — fine for
+    # single-participant inbound, but on outbound (after
+    # wait_until_answered=True) there's a brief window where the dial
+    # leg can co-exist with the answered leg and routing is ambiguous.
+    # Filtering by participant_identity removes the race.
+    room_input = RoomInputOptions(
+        noise_cancellation=noise_cancellation.BVCTelephony(),
+    )
+    if sip_participant is not None:
+        room_input = RoomInputOptions(
+            noise_cancellation=noise_cancellation.BVCTelephony(),
+            participant_identity=sip_participant.identity,
+            participant_kinds=[rtc.ParticipantKind.PARTICIPANT_KIND_SIP],
+        )
+
     await session.start(
         agent=VBAQualifierAgent(guest_context=guest_ctx),
         room=ctx.room,
-        room_input_options=RoomInputOptions(
-            # BVCTelephony tuned for 8kHz/narrowband SIP audio.
-            noise_cancellation=noise_cancellation.BVCTelephony(),
-        ),
+        room_input_options=room_input,
     )
 
     # Speak first AFTER the callee is in the room. For outbound, this

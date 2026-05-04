@@ -69,7 +69,7 @@ def _jaccard(a: set[str], b: set[str]) -> float:
     return len(a & b) / len(a | b)
 
 
-def match_qa(text: str, *, threshold: float = 0.15, top_k: int = 1) -> list[QAMatch]:
+def match_qa(text: str, *, threshold: float = 0.20, top_k: int = 1) -> list[QAMatch]:
     if not text or not text.strip():
         return []
     q = _tokenize(text)
