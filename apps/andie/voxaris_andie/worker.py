@@ -1437,10 +1437,11 @@ async def entrypoint(ctx: JobContext) -> None:
     )
 
     primary_tts = inference.TTS(
-        # Lagoon voice on Rime mistv3 — same voice as Deedy by request.
+        # Wildflower voice on Rime mistv3 — distinct from Deedy's
+        # Lagoon so members can tell the two agents apart.
         model="rime/mistv3",
-        voice="lagoon",
-        language="en",
+        voice="wildflower",
+        language="eng",
         # 16kHz native > 24kHz default — cleaner 16→8 SIP downsample
         # avoids the 24→8 resample artifacts that caused slurring.
         sample_rate=16000,
