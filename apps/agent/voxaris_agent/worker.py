@@ -383,7 +383,13 @@ DEFAULT_GUEST_CONTEXT = {
     # used internally for booking + confirmation language only,
     # never as part of Deedy's identity ("I'm with Westgate" — NO).
     "property_name": "the resort",
-    "premium_offer": "two complimentary two-day Disney park hopper tickets",
+    # `premium_offer` is the spoken marketing copy for the active
+    # partner campaign. Default is a generic "ten dollar gift"; the
+    # actual value (e.g. "complimentary three-night getaway",
+    # "fifty dollar gift card", whatever the partner is running)
+    # MUST be passed per-call via dispatch metadata. Deedy speaks
+    # whatever string lands here — she has no opinion about brand.
+    "premium_offer": "ten dollar gift",
     "premium_internal_name": "",  # ops-only mirror; never substituted into prompt
     "placement_name": "your placement location",
     "placement_opener_hook": "",
@@ -400,7 +406,7 @@ DEFAULT_GUEST_CONTEXT = {
     "direction": "inbound",  # overridden to "outbound" when entrypoint dials
     # Legacy aliases.
     "resort_name": "the resort",
-    "incentive": "two complimentary two-day Disney park hopper tickets",
+    "incentive": "ten dollar gift",
     "guest_stay_type": "off_property",
     "placement_location": "your placement location",
 }
