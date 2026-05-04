@@ -1,0 +1,18 @@
+{
+  "dispatchRule": {
+    "rule": {
+      "dispatchRuleIndividual": { "roomPrefix": "inbound-" }
+    },
+    "name": "voxaris-vba-inbound",
+    "metadata": "{\"direction\":\"inbound\",\"premium_offer\":\"limited-time premium offer\",\"placement_name\":\"QR scan\"}",
+    "trunkIds": ["ST_9PLF6ujQSyXu"],
+    "roomConfig": {
+      "agents": [
+        {
+          "agentName": "deedy-vba",
+          "metadata": "{\"direction\":\"inbound\"}"
+        }
+      ]
+    }
+  }
+}

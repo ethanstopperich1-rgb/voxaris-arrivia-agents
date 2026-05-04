@@ -1,0 +1,206 @@
+[
+  {
+    "question": "What is this call/program about?",
+    "answer": "Government Vacation Rewards is a private travel rewards program for military, veterans, government employees, and eligible members. Your account gives you travel savings credits, discounts, and depending on membership level, access to reward points, Great Getaways, and Quarterly Specials."
+  },
+  {
+    "question": "What are Savings Credits?",
+    "answer": "Savings Credits are travel dollars used as partial payment to reduce the cost of hotels, resorts, cruises, tours, and some travel bookings. They help bring retail pricing closer to member-only pricing."
+  },
+  {
+    "question": "Are Savings Credits real cash?",
+    "answer": "They work like travel currency inside your GVR account. They are not withdrawn as cash, but they can reduce eligible travel costs at checkout."
+  },
+  {
+    "question": "How do Savings Credits work on a hotel?",
+    "answer": "If a hotel is $800 and your member savings are $250, the credits reduce the price so you pay the lower out-of-pocket amount from $800 to $550"
+  },
+  {
+    "question": "Can I use Savings Credits on cruises?",
+    "answer": "Yes. Savings Credits can be applied toward eligible cruises, hotels, resorts, and tours. Cruise savings vary based on cruise line and time of year, but they can still reduce your out-of-pocket price."
+  },
+  {
+    "question": "Can I use credits on flights?",
+    "answer": "They cannot be used on flights however the program may mirror airline pricing. Booking travel through the account can help you earn reward points when eligible."
+  },
+  {
+    "question": "Do Savings Credits expire?",
+    "answer": "Savings credits usually have a two-year booking window once deposited. Of course, you can travel beyond that window when inventory allows."
+  },
+  {
+    "question": "What are Reward Points?",
+    "answer": "Reward Points are earned when you book travel through the program. Select Access members earn 5 points per dollar spent on eligible travel. Points can be redeemed for vacations or converted into travel cash."
+  },
+  {
+    "question": "How do points turn into free vacations?",
+    "answer": "Once you have enough points, you can redeem them toward featured resort stays, cruises, or vacation redemptions."
+  },
+  {
+    "question": "Are points the same as dollars?",
+    "answer": "Not exactly. Points can sometimes convert into vacation cash, but they are usually more valuable when redeemed for featured vacations instead of cash."
+  },
+  {
+    "question": "How many points do I need for a vacation?",
+    "answer": "Script language shows resort stays may start around 20,000–25,000 points, all-inclusive resorts around 35,000 points, cruises around 50,000 points, and premium options around 75,000–100,000+ points."
+  },
+  {
+    "question": "Can I use points for flights?",
+    "answer": "Points may be convertible into travel cash that can help offset travel costs, including flights, but the best value is usually using points toward resort or cruise redemptions."
+  },
+  {
+    "question": "Can I combine points and Savings Credits?",
+    "answer": "Yes, depending on the booking type. Savings Credits help lower the cost, and points may be used for redemptions or converted into vacation cash when available."
+  },
+  {
+    "question": "What are Great Getaways?",
+    "answer": "Great Getaways are discounted resort/hotel weeks, often priced under $499 for the stay, not per night. They are one of the key Select Access benefits."
+  },
+  {
+    "question": "Is the $499 per person or per night?",
+    "answer": "No. Great Getaways are generally positioned as the total price for the stay/week, not per person or per night."
+  },
+  {
+    "question": "How many people does a Great Getaway cover?",
+    "answer": "It depends on the property and unit size, but commonly the resort/hotel pricing covers the stay, often for two or more guests, not a separate price per person."
+  },
+  {
+    "question": "Can I book Great Getaways anytime?",
+    "answer": "Great Getaways inventory changes and is subject to availability. Members can search available destinations and dates through the website."
+  },
+  {
+    "question": "What are Quarterly Specials?",
+    "answer": "Quarterly Specials are limited booking windows offered four times per year with deeply discounted resorts, hotels, and cruises."
+  },
+  {
+    "question": "When are Quarterly Specials available?",
+    "answer": "Typically, February, May, August, and November. As an example we have an upcoming sale May 12–17"
+  },
+  {
+    "question": "Do I have to travel during the Quarterly Special month?",
+    "answer": "No. The booking window is when you reserve the deal. Travel can often be later, depending on availability and property rules. As an example members will book during May but travel in July, October, or even later."
+  },
+  {
+    "question": "How many Quarterly Specials can I book?",
+    "answer": "One per quarter, so up to four per year, subject to availability and the rules of that promotion."
+  },
+  {
+    "question": "Why are Quarterly Specials limited?",
+    "answer": "Because the discounts are deeper, availability is limited and only released during specific booking windows."
+  },
+  {
+    "question": "What does Select Access unlock?",
+    "answer": "Select Access unlocks the premium benefits: Reward Points, Great Getaways, Quarterly Specials, and featured/free vacation redemptions. Joe explains free members have Savings Credits, while Select Access unlocks the full benefit set."
+  },
+  {
+    "question": "Why does my page say “locked benefit”?",
+    "answer": "That means the benefit is visible as a preview, but not active on the current membership level. Select Access unlocks those benefits."
+  },
+  {
+    "question": "Can I preview locked benefits?",
+    "answer": "Yes. Members can click preview to see examples of Great Getaways, Quarterly Specials, and featured redemptions before upgrading."
+  },
+  {
+    "question": "Can family use my membership?",
+    "answer": "Yes. You can add users or share benefits with friends and family, depending on account setup. They can access discounts, and their eligible bookings can help you earn points."
+  },
+  {
+    "question": "What is an authorized user?",
+    "answer": "An authorized user has broader access to the account, usually a spouse or trusted person. This is someone with full access to the account."
+  },
+  {
+    "question": "What is Friends & Family?",
+    "answer": "Friends & Family users can receive access to discounts without seeing or using everything in the primary account. This is good for relatives or close friends who travel."
+  },
+  {
+    "question": "Can friends/family use my points?",
+    "answer": "Generally, authorized users may have broader access including access to points, while friends/family can receive discounts."
+  },
+  {
+    "question": "Do friends/family have to be military?",
+    "answer": "Friend and family do not have to be military to use your account."
+  },
+  {
+    "question": "How do referrals work?",
+    "answer": "Members can send a referral link from the website. If the referred person enrolls, the original member may receive bonus points or credits depending on the level of membership of the referral"
+  },
+  {
+    "question": "Can I post my referral link on social media?",
+    "answer": "Yes, the referral link can be copied and shared, including on social media."
+  },
+  {
+    "question": "Where do I log in?",
+    "answer": "Go to govvacationrewards.com and sign in with the email used during enrollment."
+  },
+  {
+    "question": "What if I forgot my password?",
+    "answer": "Use the password reset option on the site or call your account manager/member services for help resetting it."
+  },
+  {
+    "question": "Where do I see my credits?",
+    "answer": "After logging in, go to My Benefits. Your currency/savings credits should appear near the top of the page."
+  },
+  {
+    "question": "Where do I find Great Getaways and Quarterly Specials?",
+    "answer": "Go to My Benefits, then scroll to the Select Access benefits section. You may see preview buttons for Great Getaways, Quarterly Specials, and Featured Redemptions."
+  },
+  {
+    "question": "Is the membership lifetime?",
+    "answer": "The upgraded access is a lifetime benefit after the membership cost is paid off, with a small annual renewal starting in year three to keep benefits active."
+  },
+  {
+    "question": "What is the annual renewal?",
+    "answer": "$29 per year starting in year three. Every renewal will include additional savings credits as a thank-you, depending on the offer."
+  },
+  {
+    "question": "Is the $29 monthly or yearly?",
+    "answer": "Yearly, not monthly."
+  },
+  {
+    "question": "Are there blackout dates?",
+    "answer": "The program does not have blackout dates, but all specific bookings are still subject to availability, inventory, destination, and supplier rules."
+  },
+  {
+    "question": "Can I book online or do I have to call?",
+    "answer": "You can do both. Simpler bookings may be done online; more complex trips, cruises, tours, or special requests are better handled by a live travel agent."
+  },
+  {
+    "question": "Can I book cruises through GVR?",
+    "answer": "Yes. GVR books with all major cruise lines including Royal Caribbean, Carnival, Norwegian, Princess, Celebrity, MSC, just to name a few."
+  },
+  {
+    "question": "Can I book car rentals?",
+    "answer": "Yes and you can use your savings credits to help reduce the cost."
+  },
+  {
+    "question": "Can I book resorts and all-inclusives?",
+    "answer": "Yes. Resorts and all-inclusive properties are a major use case for Savings Credits, Great Getaways, Quarterly Specials, and points redemptions."
+  },
+  {
+    "question": "Can I use this for a trip I already planned?",
+    "answer": "Possibly, but it depends whether the trip has already been booked and whether GVR has inventory for the same destination/dates."
+  },
+  {
+    "question": "Can I use the account for someone else’s trip?",
+    "answer": "Yes, in many cases you can help family/friends book through your account or add them as users, depending on account permissions."
+  },
+  {
+    "question": "Why should I book through GVR instead of Expedia/Booking/Hilton?",
+    "answer": "GVR is designed to add member-only savings, credits, points, and access to special inventory. The member can still compare pricing, and GVR offers a best value/best price guarantee on eligible bookings. The advantage is you can earn points to use towards future travel versus booking through any other site."
+  },
+  {
+    "question": "What does Best Value Guarantee mean?",
+    "answer": "If you find a lower eligible price elsewhere, GVR may match it according to program terms."
+  },
+  {
+    "question": "Why can’t I see all the benefits yet?",
+    "answer": "Some benefits are preview-only until Select Access is activated. The free membership usually shows Savings Credits, while premium benefits remain locked."
+  },
+  {
+    "question": "Are redemptions guaranteed?",
+    "answer": "No specific property/date is guaranteed. Redemptions are subject to availability, destination, property, cabin category, and program rules."
+  },
+  {
+    "question": "What should I do first after logging in?",
+    "answer": "Go to My Benefits, review your Savings Credits, then explore hotels/resorts/cruises or preview Select Access benefits like Great Getaways, Quarterly Specials, and Featured Redemptions."
+  }
+]

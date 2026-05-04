@@ -1,0 +1,422 @@
+[
+  {
+    "category": "skepticism_trust",
+    "objection": "Is this a scam?",
+    "rebuttal": "I completely understand the caution — a lot of members feel the same way. I can verify the last four digits of the email or phone we have on file for you. Would that help confirm this is legitimate?"
+  },
+  {
+    "category": "skepticism_trust",
+    "objection": "How did you get my number?",
+    "rebuttal": "Your number is on file because you're an enrolled GVR member. If you'd prefer not to receive these calls, I can note that right now. Or I can send everything in writing instead."
+  },
+  {
+    "category": "skepticism_trust",
+    "objection": "I don't remember signing up for this.",
+    "rebuttal": "Totally fair — let me confirm: you enrolled on {{enrollment_date}} using {{enrollment_email}}. Does that ring a bell?"
+  },
+  {
+    "category": "skepticism_trust",
+    "objection": "This sounds too good to be true.",
+    "rebuttal": "I get it. There's no cost on this call — these are credits you already have on your account. I can send everything in writing so you can review on your own time before doing anything."
+  },
+  {
+    "category": "skepticism_trust",
+    "objection": "I've seen this on TikTok or Reddit — it's a scam.",
+    "rebuttal": "Smart to be careful. You can verify by logging in at govvacationrewards.com directly, or have our team call you back from the official number on your statement. No pressure either way."
+  },
+  {
+    "category": "skepticism_trust",
+    "objection": "You're not going to ask for my credit card, right?",
+    "rebuttal": "Absolutely not. I never take card numbers or sensitive payment info on this call. Anything related to payment is handled separately by a specialist on a secure line."
+  },
+  {
+    "category": "skepticism_trust",
+    "objection": "I get these calls all the time and they're all scams.",
+    "rebuttal": "Fair. The difference here is you can confirm me — log in at govvacationrewards.com or check the number on the back of your membership card. I'll wait."
+  },
+  {
+    "category": "skepticism_trust",
+    "objection": "Can you prove you're really from the program?",
+    "rebuttal": "Yes. I can confirm your enrollment date and the email on file. I can also send you a one-time passcode to your registered email so you can verify on your end."
+  },
+  {
+    "category": "skepticism_trust",
+    "objection": "I want to hang up now.",
+    "rebuttal": "Of course — no pressure at all. Before you go: you have unused credits on your account whenever you're ready. Have a great day."
+  },
+  {
+    "category": "time_pressure",
+    "objection": "I'm really busy right now.",
+    "rebuttal": "Totally understand — this'll only take 2 to 3 minutes and could unlock value you've already earned. Or I can text you a link to handle it on your time. Which works better?"
+  },
+  {
+    "category": "time_pressure",
+    "objection": "Can you call back later?",
+    "rebuttal": "I can. What time tomorrow tends to work for you? Or if it's easier, I can text you a scheduling link right now and you pick the slot."
+  },
+  {
+    "category": "time_pressure",
+    "objection": "I don't have time for this.",
+    "rebuttal": "No problem — let me text you everything in writing so you can review when you have 5 minutes. What's the best number for the text?"
+  },
+  {
+    "category": "time_pressure",
+    "objection": "I'm at work / with the kids / driving.",
+    "rebuttal": "Got it — let's not do this now. I'll send you a link by text so you can book a callback whenever it's convenient. Sound good?"
+  },
+  {
+    "category": "time_pressure",
+    "objection": "This isn't a good time.",
+    "rebuttal": "Totally understand. Want me to text or email a scheduling link so you can pick a better window?"
+  },
+  {
+    "category": "time_pressure",
+    "objection": "I need to go.",
+    "rebuttal": "No problem — I'll send the details to your email or by text so nothing's lost. Email or text?"
+  },
+  {
+    "category": "time_pressure",
+    "objection": "Can we do this another day?",
+    "rebuttal": "Absolutely. I'll send you a link to schedule when it works for you — credits stay in your account until you're ready."
+  },
+  {
+    "category": "time_pressure",
+    "objection": "I'm on my way out the door.",
+    "rebuttal": "Got it — I'll text you the scheduling link so you can grab a slot at your convenience. Talk soon."
+  },
+  {
+    "category": "travel_fit",
+    "objection": "I don't travel enough to make this worth it.",
+    "rebuttal": "A lot of members feel that way at first. The credits you have don't expire for two years and can be used for weekend getaways, family visits, even gifting stays. No minimum travel required."
+  },
+  {
+    "category": "travel_fit",
+    "objection": "We have young kids — we don't go anywhere.",
+    "rebuttal": "Totally get it. A lot of families with young kids use it for short drivable trips, all-inclusives that handle childcare, or to bank credits for when the kids are older. Everything works at your pace."
+  },
+  {
+    "category": "travel_fit",
+    "objection": "We're retired — we don't travel like we used to.",
+    "rebuttal": "Some of our most active members are retirees taking longer relaxed trips, visiting grandkids, or gifting stays. It's flexible — use it when and how it fits."
+  },
+  {
+    "category": "travel_fit",
+    "objection": "I already have enough points or memberships.",
+    "rebuttal": "You can stack with what you already have. The Savings Credits work alongside any other program — no exclusivity, just deeper discounts."
+  },
+  {
+    "category": "travel_fit",
+    "objection": "We're in the military and move every couple years.",
+    "rebuttal": "Perfect fit honestly — a lot of military families love this because the credits work wherever you're stationed and don't expire when you PCS."
+  },
+  {
+    "category": "travel_fit",
+    "objection": "This isn't useful for us anymore.",
+    "rebuttal": "Fair — let me ask quickly: when's the last time you actually checked what's available? A specialist can do a quick benefits audit and you decide from there."
+  },
+  {
+    "category": "travel_fit",
+    "objection": "I don't fly. I only drive. I hate resorts.",
+    "rebuttal": "All good — Savings Credits work on hotels, car rentals, and even cabin or Airbnb-style stays. No requirement to fly or stay at a big resort."
+  },
+  {
+    "category": "travel_fit",
+    "objection": "We already book through another program.",
+    "rebuttal": "Many members do — these credits stack on top. Worth a 2-minute look at what extra savings you could get on top of what you already use."
+  },
+  {
+    "category": "travel_fit",
+    "objection": "I'm too old for this now.",
+    "rebuttal": "I hear you. Honestly, our easiest use case for members in your stage is gifting stays to family — you've earned the credits, let your kids or grandkids use them on their next trip."
+  },
+  {
+    "category": "cost_value",
+    "objection": "How much is this going to cost me?",
+    "rebuttal": "Nothing on this call. The credits are already on your account from when you enrolled — no fee to use them, no upgrade required."
+  },
+  {
+    "category": "cost_value",
+    "objection": "I don't want to pay any fees.",
+    "rebuttal": "Understood — and there are no fees to use what you have today. Anything optional is clearly priced and the specialist will only show you it if you ask."
+  },
+  {
+    "category": "cost_value",
+    "objection": "Is there an annual fee?",
+    "rebuttal": "Not on what you have now. There's an optional upgrade tier with a small annual amount in year three onward, but that's only if you choose it — completely optional."
+  },
+  {
+    "category": "cost_value",
+    "objection": "I already pay enough for my membership.",
+    "rebuttal": "Right — and this call is about getting more value out of what you've already paid for. Let me show you what's sitting unused."
+  },
+  {
+    "category": "cost_value",
+    "objection": "This sounds like it's going to cost money.",
+    "rebuttal": "It doesn't. This call is a courtesy. The specialist may show you optional things, but you're under zero obligation."
+  },
+  {
+    "category": "cost_value",
+    "objection": "I don't want to spend more on travel.",
+    "rebuttal": "Totally fair — the Savings Credits actually reduce your existing travel spend, they don't add to it. Whatever you were already going to book just costs less."
+  },
+  {
+    "category": "cost_value",
+    "objection": "Are there hidden fees?",
+    "rebuttal": "No. I'd never set you up for that. The specialist will walk through everything line by line — and if anything ever feels unclear, you stop and we don't proceed."
+  },
+  {
+    "category": "cost_value",
+    "objection": "I can't afford anything extra right now.",
+    "rebuttal": "Got it — and you don't need to spend anything to use what you already have. Let's focus on the unused credits sitting on your account."
+  },
+  {
+    "category": "cost_value",
+    "objection": "What's the catch?",
+    "rebuttal": "Honest answer: there's no catch on this call. The catch elsewhere in life is usually fees or commitments — here, the credits were funded at enrollment and they're yours."
+  },
+  {
+    "category": "cost_value",
+    "objection": "I don't want to upgrade or buy anything.",
+    "rebuttal": "Perfect — you don't have to. Let's focus on what's already yours and how to use it. The specialist won't push anything."
+  },
+  {
+    "category": "privacy_data",
+    "objection": "How did you get my information?",
+    "rebuttal": "It's on file because you enrolled — same email and phone you used at signup. If you'd rather we not call, I can mark you as do-not-contact right now."
+  },
+  {
+    "category": "privacy_data",
+    "objection": "I didn't give you permission to call me.",
+    "rebuttal": "Per the enrollment terms, member-services calls are part of standard service. If you'd prefer to opt out of these specifically, I can update that immediately."
+  },
+  {
+    "category": "privacy_data",
+    "objection": "This feels like a privacy violation.",
+    "rebuttal": "I hear you — and I respect that. I can mark you as do-not-call right now, and any future communication only goes by email or app, whichever you prefer."
+  },
+  {
+    "category": "privacy_data",
+    "objection": "I want my information removed.",
+    "rebuttal": "I'll note that. To complete a full data-removal request, the specialist will route you to our privacy team — that's the proper channel. Want me to set that up?"
+  },
+  {
+    "category": "privacy_data",
+    "objection": "Who gave you my contact info?",
+    "rebuttal": "You did, at enrollment. I can confirm the email on file: it ends in {{email_last_chars}}. Recognize that?"
+  },
+  {
+    "category": "privacy_data",
+    "objection": "I don't want to be called again.",
+    "rebuttal": "Got it — done. I'm marking your number as do-not-contact for outreach. You'll still be able to reach us if you want, but we won't reach out."
+  },
+  {
+    "category": "privacy_data",
+    "objection": "This is a violation of my privacy.",
+    "rebuttal": "I take that seriously. I'm noting your preference right now. Do you want all communications to stop, or just phone calls?"
+  },
+  {
+    "category": "privacy_data",
+    "objection": "I want to be taken off your list.",
+    "rebuttal": "Understood — done. I'm marking your number do-not-contact. You will not receive further calls. Have a good day."
+  },
+  {
+    "category": "negative_past",
+    "objection": "I had a bad experience with another program.",
+    "rebuttal": "I'm sorry about that. What specifically went wrong? I want to make sure that doesn't happen here — and if it sounds like a bad fit, I'll tell you straight up."
+  },
+  {
+    "category": "negative_past",
+    "objection": "I got ripped off before.",
+    "rebuttal": "That's frustrating. This is just about credits already on your account — no purchase, no commitment. If you decide to walk away, you walk away with the same balance."
+  },
+  {
+    "category": "negative_past",
+    "objection": "I don't trust these programs anymore.",
+    "rebuttal": "Fair. I'd rather you verify before doing anything — log into govvacationrewards.com or call the number on your statement. I'll wait."
+  },
+  {
+    "category": "negative_past",
+    "objection": "I tried to use my points before and it was a nightmare.",
+    "rebuttal": "Tell me what happened? If there's a redemption issue, the specialist can fix it on the call — sometimes it's a flag on the account that takes 30 seconds to clear."
+  },
+  {
+    "category": "negative_past",
+    "objection": "I regret ever signing up for this.",
+    "rebuttal": "I get it. Two paths from here: cancel cleanly, or use the credits you have on a trip and then decide. Which feels right to you?"
+  },
+  {
+    "category": "negative_past",
+    "objection": "I want to cancel everything.",
+    "rebuttal": "I can help with that. The cancellation process is handled by a specialist — let me get them on the line so you don't have to call back."
+  },
+  {
+    "category": "negative_past",
+    "objection": "This is exactly why I stopped using it.",
+    "rebuttal": "Tell me more — was it a redemption issue or something else? If we can fix the specific thing, the credits sitting there are still yours."
+  },
+  {
+    "category": "negative_past",
+    "objection": "I had a horrible time redeeming before.",
+    "rebuttal": "That's the most common feedback — and it's the thing the specialist can usually fix in a few minutes. Worth a try before you walk away from credits you've earned?"
+  },
+  {
+    "category": "negative_past",
+    "objection": "I don't want to go through that again.",
+    "rebuttal": "Hear you. The specialist will do the redemption with you, not for you to figure out alone. If it doesn't feel right, you stop. No commitment."
+  },
+  {
+    "category": "decision_maker",
+    "objection": "I need to talk to my spouse first.",
+    "rebuttal": "Totally understand. Want me to text both of you a summary so you can review together, or schedule a callback when you're both available?"
+  },
+  {
+    "category": "decision_maker",
+    "objection": "My financial advisor handles this.",
+    "rebuttal": "There's nothing financial to decide here — these are credits already on your account. But if you'd like, I can send a one-page summary you can forward."
+  },
+  {
+    "category": "decision_maker",
+    "objection": "I don't make these decisions alone.",
+    "rebuttal": "Got it — let me send you everything in writing. Or I can schedule a 3-way call with you and your partner. What works better?"
+  },
+  {
+    "category": "decision_maker",
+    "objection": "Can you send this to my spouse?",
+    "rebuttal": "Yes — what's the best email or number? I can send the same details to both of you."
+  },
+  {
+    "category": "decision_maker",
+    "objection": "My kids handle my finances now.",
+    "rebuttal": "Of course. I can send the details to whoever you'd like — or schedule a call when they're available with you."
+  },
+  {
+    "category": "decision_maker",
+    "objection": "I need to check with my power of attorney.",
+    "rebuttal": "Absolutely. Nothing on this call requires a decision today. I'll send a written summary you can share."
+  },
+  {
+    "category": "decision_maker",
+    "objection": "I'm not the decision maker on this.",
+    "rebuttal": "No problem. I'll send you a one-pager you can pass along — or we can schedule a callback once you've talked it over."
+  },
+  {
+    "category": "channel_pref",
+    "objection": "Can you just email me?",
+    "rebuttal": "Yes — what's the best email? I'll send everything you need to review on your own time."
+  },
+  {
+    "category": "channel_pref",
+    "objection": "I don't do phone calls.",
+    "rebuttal": "Totally get it. Text or email work — which is easier? I'll send a scheduling link and the benefits summary."
+  },
+  {
+    "category": "channel_pref",
+    "objection": "Text me instead.",
+    "rebuttal": "On it. What's the best number? I'll send the link and a summary right now."
+  },
+  {
+    "category": "channel_pref",
+    "objection": "I prefer to handle this online.",
+    "rebuttal": "Smart. Log in at govvacationrewards.com — under My Benefits you'll see your credits. Want me to text you the direct link?"
+  },
+  {
+    "category": "channel_pref",
+    "objection": "Can you send it in the app?",
+    "rebuttal": "I can text you the app link — once logged in, your credits are right under My Benefits. Send to the number on file?"
+  },
+  {
+    "category": "channel_pref",
+    "objection": "I don't answer unknown numbers.",
+    "rebuttal": "Fair — that's why a lot of members prefer text. I can text you the scheduler link and you can confirm a callback from a number you'll recognize."
+  },
+  {
+    "category": "channel_pref",
+    "objection": "Email is better for me.",
+    "rebuttal": "Done — I'll send a summary plus a scheduling link. Same email we have on file, or a different one?"
+  },
+  {
+    "category": "channel_pref",
+    "objection": "I want to do this through the website.",
+    "rebuttal": "Perfect — log in at govvacationrewards.com, click My Benefits. I'll text you the link to bookmark. Sound good?"
+  },
+  {
+    "category": "life_stage",
+    "objection": "I'm too old for this now.",
+    "rebuttal": "I hear you. The most popular use case for members in your stage is gifting stays to family — you've earned the credits, let your kids or grandkids use them."
+  },
+  {
+    "category": "life_stage",
+    "objection": "My health isn't great anymore.",
+    "rebuttal": "I'm sorry to hear that. The credits don't have a deadline — they sit there until you or someone in your family wants to use them. Or we can pause outreach entirely if you'd like."
+  },
+  {
+    "category": "life_stage",
+    "objection": "We don't travel like we used to.",
+    "rebuttal": "Totally fair. A lot of members in similar shoes use it for shorter local trips, family visits, or gifting. Want me to text you a quick summary you can use whenever?"
+  },
+  {
+    "category": "life_stage",
+    "objection": "I'm retired and on a fixed income.",
+    "rebuttal": "Got it — and there's no spending required on this call. The credits reduce travel cost; they don't add to your bills."
+  },
+  {
+    "category": "life_stage",
+    "objection": "We have health issues that make travel hard.",
+    "rebuttal": "Understood. Honestly, the gifting feature might be the best fit — pass the credits to family who'll use them. The specialist can walk you through that."
+  },
+  {
+    "category": "life_stage",
+    "objection": "Our kids are grown — we don't go as much.",
+    "rebuttal": "Common situation. A lot of members in this stage use credits for visiting grandkids or splitting trips with extended family. Specialist can show you specific options."
+  },
+  {
+    "category": "life_stage",
+    "objection": "I'm not in a position to travel right now.",
+    "rebuttal": "Hear you. The credits don't expire urgently — let me send you everything in writing so it's there whenever you're ready. Email or text?"
+  },
+  {
+    "category": "rejection",
+    "objection": "No thanks.",
+    "rebuttal": "Understood. Just so you know, you have unused credits on your account whenever you're ready. Have a great day."
+  },
+  {
+    "category": "rejection",
+    "objection": "I'm not interested.",
+    "rebuttal": "All good. The credits stay on your account — no time pressure. Take care."
+  },
+  {
+    "category": "rejection",
+    "objection": "Take me off your list.",
+    "rebuttal": "Done — I'm marking your number as do-not-contact right now. You'll receive no further calls. Have a good day."
+  },
+  {
+    "category": "rejection",
+    "objection": "Don't call me again.",
+    "rebuttal": "Got it. Marked as do-not-contact. Take care."
+  },
+  {
+    "category": "rejection",
+    "objection": "I want to opt out.",
+    "rebuttal": "Understood. I'm processing the opt-out now. You can also reply STOP to any text from us. Have a good day."
+  },
+  {
+    "category": "rejection",
+    "objection": "Stop calling.",
+    "rebuttal": "Done. Your number's flagged. You will not receive further calls."
+  },
+  {
+    "category": "rejection",
+    "objection": "I don't want this.",
+    "rebuttal": "No problem — no obligation here. Marking your account preferences accordingly. Take care."
+  },
+  {
+    "category": "rejection",
+    "objection": "Remove me from your system.",
+    "rebuttal": "I'm flagging your number for do-not-contact now. For full data removal, the specialist routes you to our privacy team — want me to set that up?"
+  },
+  {
+    "category": "rejection",
+    "objection": "I'm hanging up now.",
+    "rebuttal": "Of course. Take care, and your credits remain on file whenever you're ready."
+  }
+]

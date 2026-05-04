@@ -1,0 +1,159 @@
+"""Smoke tests for Andie — package imports + persona invariants."""
+from __future__ import annotations
+
+
+def test_module_imports() -> None:
+    from voxaris_andie import worker
+    assert worker.entrypoint is not None
+    assert worker.cli_main is not None
+
+
+def _flat(t: str) -> str:
+    return " ".join(t.split()).lower()
+
+
+def test_persona_brands_as_arrivia_and_gvr() -> None:
+    from voxaris_andie.worker import render_persona
+    text = _flat(render_persona())
+    assert "arrivia" in text
+    assert "government vacation rewards" in text
+    assert "uh-rih-vee-uh" in text
+
+
+def test_persona_disclaims_government_endorsement() -> None:
+    from voxaris_andie.worker import render_persona
+    text = _flat(render_persona())
+    assert "not a government" in text
+    assert "not endorsed" in text or "endorsed by the u.s. military" in text
+
+
+def test_persona_has_pci_prohibition() -> None:
+    from voxaris_andie.worker import render_persona
+    text = _flat(render_persona())
+    assert "ssn" in text
+    assert "credit card" in text
+    assert "please stop" in text
+
+
+def test_persona_has_4_pillars() -> None:
+    from voxaris_andie.worker import render_persona
+    text = _flat(render_persona())
+    for pillar in ("savings credits", "reward points", "great getaways", "quarterly specials"):
+        assert pillar in text, f"missing pillar: {pillar}"
+
+
+def test_inbound_greeting_leads_with_live_transfer() -> None:
+    """User explicitly required: live transfer = default, link = backup."""
+    from voxaris_andie.worker import render_greeting
+    text = _flat(render_greeting({"direction": "inbound"}))
+    assert "thanks for calling" in text
+    assert "specialist" in text
+    # Live transfer must be the default offer in the greeting
+    assert "right now" in text or "right-now" in text
+
+
+def test_outbound_greeting_says_calling() -> None:
+    from voxaris_andie.worker import render_greeting
+    text = _flat(render_greeting({"direction": "outbound"}))
+    assert "calling" in text or "reaching out" in text
+
+
+def test_persona_uses_andee_phonetic() -> None:
+    """Rime mistv3 reads "Andie" as letters; persona uses "Andee"."""
+    from voxaris_andie.worker import render_greeting, render_persona
+    assert "Andee" in render_greeting()
+    assert "Andee" in render_persona()
+
+
+def test_persona_lists_real_tools() -> None:
+    from voxaris_andie.worker import render_persona
+    text = render_persona()
+    for tool in ("lookup_faq", "send_scheduler_link", "transfer_to_specialist", "hangup_call"):
+        assert tool in text
+
+
+def test_qa_loaded() -> None:
+    from voxaris_andie.qa import count
+    assert count() > 0
+
+
+def test_objections_loaded_84_entries() -> None:
+    """Per Grok multi-source research: 84 objections across 10
+    categories, far more than the 5 in the original Transfer Script."""
+    from voxaris_andie.objections import categories, count
+
+    assert count() == 84
+    cats = set(categories())
+    expected = {
+        "skepticism_trust", "time_pressure", "travel_fit", "cost_value",
+        "privacy_data", "negative_past", "decision_maker", "channel_pref",
+        "life_stage", "rejection",
+    }
+    assert expected.issubset(cats), f"missing categories: {expected - cats}"
+
+
+def test_objection_lookup_handles_common_phrases() -> None:
+    from voxaris_andie.objections import match_objection
+
+    cases = [
+        ("is this a scam?", "skepticism_trust"),
+        ("im busy right now", "time_pressure"),
+        ("we dont travel much", "travel_fit"),
+        ("how much does it cost", "cost_value"),
+        ("how did you get my number", "privacy_data"),
+        ("take me off your list", "rejection"),
+    ]
+    for phrase, expected_cat in cases:
+        res = match_objection(phrase, top_k=3)
+        cats = [m.category for m in res]
+        assert expected_cat in cats, (
+            f"{phrase!r} expected {expected_cat}, got {cats}"
+        )
+
+
+def test_persona_has_ftc_disclaimer_rules() -> None:
+    """FTC enforcement risk — must explicitly correct gov endorsement
+    misconceptions and never use 'government-approved' phrasing."""
+    from voxaris_andie.worker import render_persona
+
+    text = _flat(render_persona())
+    # Must include the safe phrases
+    assert "private travel-rewards program" in text
+    assert "not affiliated" in text
+    # Must include the explicit "never use" red-flag list
+    assert "government-approved" in text  # appears in the don't-say list
+    assert "must never use" in text or "never use" in text
+
+
+def test_persona_has_scam_pattern_blocklist() -> None:
+    """Per Grok trust research: certain phrases pattern-match to scam
+    calls and tank caller trust even when said innocently."""
+    from voxaris_andie.worker import render_persona
+
+    text = _flat(render_persona())
+    # The blocklist itself must appear in the persona
+    assert "scam-pattern" in text or "scam pattern" in text
+    assert "act now" in text  # in the don't-say list
+    assert "press 1 to claim" in text or "press 1" in text
+
+
+def test_persona_has_trust_building_phrases() -> None:
+    from voxaris_andie.worker import render_persona
+
+    text = _flat(render_persona())
+    assert "trust-building" in text or "wary" in text
+    assert "log into your account" in text
+    assert "courtesy call" in text
+
+
+def test_persona_lists_lookup_objection_tool() -> None:
+    from voxaris_andie.worker import render_persona
+
+    assert "lookup_objection" in render_persona()
+
+
+def test_metadata_parser() -> None:
+    from voxaris_andie.worker import parse_metadata
+    assert parse_metadata(None) == {}
+    assert parse_metadata("not json") == {}
+    assert parse_metadata('{"member_name": "Jane"}') == {"member_name": "Jane"}

@@ -1,0 +1,17 @@
+{
+  "dispatchRule": {
+    "rule": {
+      "dispatchRuleIndividual": { "roomPrefix": "andie-" }
+    },
+    "name": "voxaris-andie-gvr-inbound",
+    "metadata": "{\"program\":\"GVR\",\"direction\":\"inbound\"}",
+    "roomConfig": {
+      "agents": [
+        {
+          "agentName": "andie-gvr",
+          "metadata": "{\"program\":\"GVR\",\"direction\":\"inbound\"}"
+        }
+      ]
+    }
+  }
+}

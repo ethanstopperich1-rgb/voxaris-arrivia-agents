@@ -83,10 +83,15 @@ async def place_call(
         # auto-dispatch mode — it joins every new room automatically,
         # no AgentDispatch needed.
         trunk_id = os.environ["LIVEKIT_SIP_OUTBOUND_TRUNK_ID"]
+        # Pass sip_number per-call (caller-ID) since the trunk uses
+        # numbers=["*"] now — the +1407 DID is no longer pinned to
+        # the Twilio trunk (it had to be unbound so inbound calls
+        # could fall through to the Voice URL).
         sip = await lk.sip.create_sip_participant(
             api.CreateSIPParticipantRequest(
                 sip_trunk_id=trunk_id,
                 sip_call_to=to,
+                sip_number=os.environ.get("TWILIO_VOICE_NUMBER", "+14072890294"),
                 room_name=room_name,
                 participant_identity=to,
                 participant_name="Caller",

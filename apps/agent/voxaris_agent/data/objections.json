@@ -2,501 +2,901 @@
   {
     "category": "TIME / COMMITMENT",
     "objection": "We don’t have time.",
-    "rebuttal": "Totally get that—most families don’t. That’s why they keep it tight to about 90 minutes. If I could get you in and out before lunch and still hook you up with [incentive], would that be worth it?"
+    "rebuttal": "Totally get that—most families don’t. That’s why they keep it tight to about 90 minutes. If I could get you in and out before lunch and still hook you up with [incentive], would that be worth it?",
+    "source": "TOP_100"
   },
   {
     "category": "TIME / COMMITMENT",
     "objection": "We’re on vacation—we don’t want to waste time.",
-    "rebuttal": "Exactly why they offer this—so you get something extra out of the trip. Most people trade 90 minutes for a full experience or savings they use the rest of the week."
+    "rebuttal": "Exactly why they offer this—so you get something extra out of the trip. Most people trade 90 minutes for a full experience or savings they use the rest of the week.",
+    "source": "TOP_100"
   },
   {
     "category": "TIME / COMMITMENT",
     "objection": "We’re too busy.",
-    "rebuttal": "What does your schedule look like tomorrow morning vs afternoon?"
+    "rebuttal": "What does your schedule look like tomorrow morning vs afternoon?",
+    "source": "TOP_100"
   },
   {
     "category": "TIME / COMMITMENT",
     "objection": "We already have plans.",
-    "rebuttal": "No problem—what day are you most flexible?"
+    "rebuttal": "No problem—what day are you most flexible?",
+    "source": "TOP_100"
   },
   {
     "category": "TIME / COMMITMENT",
     "objection": "We don’t want to sit through a long presentation.",
-    "rebuttal": "It’s actually not a seminar—it’s more of a walkthrough of how people travel smarter."
+    "rebuttal": "It’s actually not a seminar—it’s more of a walkthrough of how people travel smarter.",
+    "source": "TOP_100"
   },
   {
     "category": "TIME / COMMITMENT",
     "objection": "How long is it really?",
-    "rebuttal": "About 90 minutes—then you’re free to go enjoy your day."
+    "rebuttal": "About 90 minutes—then you’re free to go enjoy your day.",
+    "source": "TOP_100"
   },
   {
     "category": "TIME / COMMITMENT",
     "objection": "We don’t want to be stuck there.",
-    "rebuttal": "They’re very strict about time—you’re not held hostage."
+    "rebuttal": "They’re very strict about time—you’re not held hostage.",
+    "source": "TOP_100"
   },
   {
     "category": "TIME / COMMITMENT",
     "objection": "We’re only here a short time.",
-    "rebuttal": "Perfect—that’s why they prioritize shorter visits like yours."
+    "rebuttal": "Perfect—that’s why they prioritize shorter visits like yours.",
+    "source": "TOP_100"
   },
   {
     "category": "TIME / COMMITMENT",
     "objection": "We just arrived.",
-    "rebuttal": "Great—best time to schedule before your trip fills up."
+    "rebuttal": "Great—best time to schedule before your trip fills up.",
+    "source": "TOP_100"
   },
   {
     "category": "TIME / COMMITMENT",
     "objection": "We’re leaving soon.",
-    "rebuttal": "Let’s lock in something early so you don’t miss out."
+    "rebuttal": "Let’s lock in something early so you don’t miss out.",
+    "source": "TOP_100"
   },
   {
     "category": "TIME / COMMITMENT",
     "objection": "We don’t want to commit to a time.",
-    "rebuttal": "Totally fair—morning or afternoon feel better?"
+    "rebuttal": "Totally fair—morning or afternoon feel better?",
+    "source": "TOP_100"
   },
   {
     "category": "TIME / COMMITMENT",
     "objection": "We’re here to relax.",
-    "rebuttal": "Exactly—this helps fund more relaxation."
+    "rebuttal": "Exactly—this helps fund more relaxation.",
+    "source": "TOP_100"
   },
   {
     "category": "TIME / COMMITMENT",
     "objection": "We don’t want to rush.",
-    "rebuttal": "That’s why we pick a time that fits your pace."
+    "rebuttal": "That’s why we pick a time that fits your pace.",
+    "source": "TOP_100"
   },
   {
     "category": "TIME / COMMITMENT",
     "objection": "We don’t want to wake up early.",
-    "rebuttal": "Afternoon slots are usually more relaxed anyway."
+    "rebuttal": "Afternoon slots are usually more relaxed anyway.",
+    "source": "TOP_100"
   },
   {
     "category": "TIME / COMMITMENT",
     "objection": "We don’t want to plan ahead.",
-    "rebuttal": "Totally—this just holds your spot, you can always adjust."
+    "rebuttal": "Totally—this just holds your spot, you can always adjust.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We don’t want to buy anything.",
-    "rebuttal": "Perfect—this isn’t about buying today."
+    "rebuttal": "Perfect—this isn’t about buying today.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We’re not interested in timeshare.",
-    "rebuttal": "Most people aren’t—until they see how it actually works now."
+    "rebuttal": "Most people aren’t—until they see how it actually works now.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We’ve heard bad things.",
-    "rebuttal": "Totally fair—this is more about seeing it for yourself."
+    "rebuttal": "Totally fair—this is more about seeing it for yourself.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We’re just not into that.",
-    "rebuttal": "That’s exactly why they invite people—to show how it’s changed."
+    "rebuttal": "That’s exactly why they invite people—to show how it’s changed.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We don’t want to be pressured.",
-    "rebuttal": "They actually focus more on education than pressure."
+    "rebuttal": "They actually focus more on education than pressure.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We don’t like sales pitches.",
-    "rebuttal": "Then you’ll like this—it’s more informational."
+    "rebuttal": "Then you’ll like this—it’s more informational.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We’ve done one before.",
-    "rebuttal": "Even better—you’ll notice how different this one is."
+    "rebuttal": "Even better—you’ll notice how different this one is.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We always say no.",
-    "rebuttal": "Perfect—you’re exactly who they expect."
+    "rebuttal": "Perfect—you’re exactly who they expect.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We’re not buyers.",
-    "rebuttal": "No problem—you still qualify for the experience."
+    "rebuttal": "No problem—you still qualify for the experience.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We hate being sold to.",
-    "rebuttal": "Same here—this is more of a preview."
+    "rebuttal": "Same here—this is more of a preview.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We won’t purchase.",
-    "rebuttal": "Totally fine—you still get the benefits."
+    "rebuttal": "Totally fine—you still get the benefits.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We don’t want a commitment.",
-    "rebuttal": "No commitment required—just attend."
+    "rebuttal": "No commitment required—just attend.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We’ve been burned before.",
-    "rebuttal": "That’s exactly why it’s worth seeing how it’s evolved."
+    "rebuttal": "That’s exactly why it’s worth seeing how it’s evolved.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We don’t trust timeshares.",
-    "rebuttal": "That’s why they let you see it firsthand."
+    "rebuttal": "That’s why they let you see it firsthand.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We’ll feel obligated.",
-    "rebuttal": "You’re not—attendance is all that’s required."
+    "rebuttal": "You’re not—attendance is all that’s required.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We don’t want the pressure after.",
-    "rebuttal": "You’re free to walk away anytime."
+    "rebuttal": "You’re free to walk away anytime.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We’re not in the market.",
-    "rebuttal": "Most people aren’t—it’s just an opportunity."
+    "rebuttal": "Most people aren’t—it’s just an opportunity.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We don’t want to deal with it.",
-    "rebuttal": "That’s why they streamline it now."
+    "rebuttal": "That’s why they streamline it now.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We don’t like sales environments.",
-    "rebuttal": "It’s more relaxed than you think."
+    "rebuttal": "It’s more relaxed than you think.",
+    "source": "TOP_100"
   },
   {
     "category": "SALES RESISTANCE",
     "objection": "We’ll just say no.",
-    "rebuttal": "Perfect—you’ll still walk away with value."
+    "rebuttal": "Perfect—you’ll still walk away with value.",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "My spouse isn’t here.",
-    "rebuttal": "They’ll need both of you—when are you together?"
+    "rebuttal": "They’ll need both of you—when are you together?",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "My spouse wouldn’t want to go.",
-    "rebuttal": "What would they say if there was a benefit tied to it?"
+    "rebuttal": "What would they say if there was a benefit tied to it?",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "We don’t make decisions together.",
-    "rebuttal": "They just require both present—it’s policy."
+    "rebuttal": "They just require both present—it’s policy.",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "We don’t want to do it together.",
-    "rebuttal": "Totally understand—just a requirement to qualify."
+    "rebuttal": "Totally understand—just a requirement to qualify.",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "We need to ask each other.",
-    "rebuttal": "Of course—what do you think they’d say?"
+    "rebuttal": "Of course—what do you think they’d say?",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "We’ll talk about it later.",
-    "rebuttal": "Let’s pencil something in while it’s available."
+    "rebuttal": "Let’s pencil something in while it’s available.",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "My partner hates these.",
-    "rebuttal": "Even better—this one might change their mind."
+    "rebuttal": "Even better—this one might change their mind.",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "We don’t agree on things like this.",
-    "rebuttal": "That’s why they walk you through it together."
+    "rebuttal": "That’s why they walk you through it together.",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "We’re not on the same page.",
-    "rebuttal": "This helps you get on the same page."
+    "rebuttal": "This helps you get on the same page.",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "We don’t want to argue about it.",
-    "rebuttal": "No pressure to decide anything."
+    "rebuttal": "No pressure to decide anything.",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "We don’t want to sit through it together.",
-    "rebuttal": "That’s actually part of the qualification."
+    "rebuttal": "That’s actually part of the qualification.",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "We’re independent decision makers.",
-    "rebuttal": "Understood—it’s just their policy."
+    "rebuttal": "Understood—it’s just their policy.",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "We’re not married.",
-    "rebuttal": "No problem—just need both present if cohabitating."
+    "rebuttal": "No problem—just need both present if cohabitating.",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "We’ll send one of us.",
-    "rebuttal": "They require both to attend."
+    "rebuttal": "They require both to attend.",
+    "source": "TOP_100"
   },
   {
     "category": "SPOUSE / DECISION MAKERS",
     "objection": "We don’t want to coordinate.",
-    "rebuttal": "Let’s find a time that works for both."
+    "rebuttal": "Let’s find a time that works for both.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We’re just passing through.",
-    "rebuttal": "Perfect—quick stop, big benefit."
+    "rebuttal": "Perfect—quick stop, big benefit.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We’re here for an event.",
-    "rebuttal": "This fits around your schedule."
+    "rebuttal": "This fits around your schedule.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We’re traveling with kids.",
-    "rebuttal": "They usually offer accommodations."
+    "rebuttal": "They usually offer accommodations.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We don’t have transportation.",
-    "rebuttal": "They often provide it."
+    "rebuttal": "They often provide it.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We don’t know the area.",
-    "rebuttal": "They’ll guide you the whole way."
+    "rebuttal": "They’ll guide you the whole way.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We’re staying off property.",
-    "rebuttal": "That’s actually common."
+    "rebuttal": "That’s actually common.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We’re not local.",
-    "rebuttal": "Even better—you qualify easier."
+    "rebuttal": "Even better—you qualify easier.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We’re tourists.",
-    "rebuttal": "That’s who this is for."
+    "rebuttal": "That’s who this is for.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We don’t want to leave our hotel.",
-    "rebuttal": "It’s a quick visit, then back to relaxing."
+    "rebuttal": "It’s a quick visit, then back to relaxing.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We’re with friends.",
-    "rebuttal": "You can coordinate together."
+    "rebuttal": "You can coordinate together.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We’re on a tight itinerary.",
-    "rebuttal": "Let’s fit it into a light window."
+    "rebuttal": "Let’s fit it into a light window.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We don’t want to travel far.",
-    "rebuttal": "It’s usually nearby."
+    "rebuttal": "It’s usually nearby.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We don’t have time to get there.",
-    "rebuttal": "Transportation helps solve that."
+    "rebuttal": "Transportation helps solve that.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We don’t want to drive.",
-    "rebuttal": "Shuttles are often available."
+    "rebuttal": "Shuttles are often available.",
+    "source": "TOP_100"
   },
   {
     "category": "TRAVEL / SITUATIONAL",
     "objection": "We’re unfamiliar with the brand.",
-    "rebuttal": "That’s why they invite you."
+    "rebuttal": "That’s why they invite you.",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We don’t make enough.",
-    "rebuttal": "What range are you in? You might still qualify."
+    "rebuttal": "What range are you in? You might still qualify.",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We don’t have good credit.",
-    "rebuttal": "They just need general eligibility."
+    "rebuttal": "They just need general eligibility.",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We’re not working right now.",
-    "rebuttal": "Do you have other income sources?"
+    "rebuttal": "Do you have other income sources?",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We’re retired.",
-    "rebuttal": "That usually qualifies if income is stable."
+    "rebuttal": "That usually qualifies if income is stable.",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We don’t want to share finances.",
-    "rebuttal": "You don’t need to disclose specifics."
+    "rebuttal": "You don’t need to disclose specifics.",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We don’t carry credit cards.",
-    "rebuttal": "They typically require one for check-in."
+    "rebuttal": "They typically require one for check-in.",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We’re budget travelers.",
-    "rebuttal": "This helps stretch your budget."
+    "rebuttal": "This helps stretch your budget.",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We don’t spend much on travel.",
-    "rebuttal": "That’s exactly who benefits most."
+    "rebuttal": "That’s exactly who benefits most.",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We’re saving money.",
-    "rebuttal": "This is a way to save on future travel."
+    "rebuttal": "This is a way to save on future travel.",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We’re not high income.",
-    "rebuttal": "You may still qualify depending on household."
+    "rebuttal": "You may still qualify depending on household.",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We don’t want a credit check.",
-    "rebuttal": "No obligation to purchase."
+    "rebuttal": "No obligation to purchase.",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We don’t want to finance anything.",
-    "rebuttal": "Totally fine—attendance only."
+    "rebuttal": "Totally fine—attendance only.",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We’re debt-free.",
-    "rebuttal": "That actually helps your qualification."
+    "rebuttal": "That actually helps your qualification.",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We don’t like payments.",
-    "rebuttal": "No requirement to buy."
+    "rebuttal": "No requirement to buy.",
+    "source": "TOP_100"
   },
   {
     "category": "FINANCIAL / QUALIFICATION",
     "objection": "We’re not spenders.",
-    "rebuttal": "Even better—you’ll appreciate the savings."
+    "rebuttal": "Even better—you’ll appreciate the savings.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "No thanks.",
-    "rebuttal": "Totally understand—can I ask what you’re most excited about on this trip?"
+    "rebuttal": "Totally understand—can I ask what you’re most excited about on this trip?",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "Not interested.",
-    "rebuttal": "What part doesn’t interest you?"
+    "rebuttal": "What part doesn’t interest you?",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "Maybe later.",
-    "rebuttal": "Let’s lock something in just in case."
+    "rebuttal": "Let’s lock something in just in case.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We’ll think about it.",
-    "rebuttal": "What would you need to know to decide?"
+    "rebuttal": "What would you need to know to decide?",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We’re good.",
-    "rebuttal": "Got it—just wanted to offer something extra."
+    "rebuttal": "Got it—just wanted to offer something extra.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We’re all set.",
-    "rebuttal": "No problem—just curious, do you travel often?"
+    "rebuttal": "No problem—just curious, do you travel often?",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We don’t do those.",
-    "rebuttal": "Most people don’t—until they try one."
+    "rebuttal": "Most people don’t—until they try one.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We’re fine.",
-    "rebuttal": "Totally—this is just a bonus option."
+    "rebuttal": "Totally—this is just a bonus option.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We’re not your target.",
-    "rebuttal": "You might be surprised."
+    "rebuttal": "You might be surprised.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We don’t qualify.",
-    "rebuttal": "Let me check that for you."
+    "rebuttal": "Let me check that for you.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We’re not interested in offers.",
-    "rebuttal": "This is more of an experience."
+    "rebuttal": "This is more of an experience.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We don’t want anything free.",
-    "rebuttal": "Totally fair—it’s more about value."
+    "rebuttal": "Totally fair—it’s more about value.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We don’t need incentives.",
-    "rebuttal": "This is just an added perk."
+    "rebuttal": "This is just an added perk.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We’re independent travelers.",
-    "rebuttal": "Perfect—you’ll appreciate flexibility."
+    "rebuttal": "Perfect—you’ll appreciate flexibility.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We don’t want obligations.",
-    "rebuttal": "No obligation required."
+    "rebuttal": "No obligation required.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We don’t want commitments.",
-    "rebuttal": "Just a visit, nothing more."
+    "rebuttal": "Just a visit, nothing more.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We don’t like structured things.",
-    "rebuttal": "It’s very casual."
+    "rebuttal": "It’s very casual.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We prefer spontaneity.",
-    "rebuttal": "This doesn’t limit that."
+    "rebuttal": "This doesn’t limit that.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We don’t plan ahead.",
-    "rebuttal": "This just holds an option."
+    "rebuttal": "This just holds an option.",
+    "source": "TOP_100"
   },
   {
     "category": "GENERAL RESISTANCE / BRUSH-OFFS",
     "objection": "We’re just browsing.",
-    "rebuttal": "Perfect—this fits that mindset."
+    "rebuttal": "Perfect—this fits that mindset.",
+    "source": "TOP_100"
+  },
+  {
+    "category": "elite_trust_legitimacy",
+    "objection": "How did you get my number?",
+    "rebuttal": "You scanned a QR code at the resort about 10 minutes ago and confirmed your number. Want me to text you a copy of what you signed up for so you can see it?",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_trust_legitimacy",
+    "objection": "Is this a scam?",
+    "rebuttal": "Totally fair to ask — I'm calling from the booking line for [Resort Name] about the offer you just opted into. I can text you the resort's main number right now if you want to call back and verify.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_trust_legitimacy",
+    "objection": "You're an AI, I don't talk to AI.",
+    "rebuttal": "Got it — totally your call. Want me to have a human call you back in the morning, or skip it entirely? Either's fine.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_trust_legitimacy",
+    "objection": "This sounds too good to be true.",
+    "rebuttal": "I hear that a lot. The catch is real — it's 90 minutes of your time at the resort. That's the whole trade. No fine print.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_trust_legitimacy",
+    "objection": "Why are you really calling?",
+    "rebuttal": "Honestly? The resort wants to show you their ownership program in hopes you'll buy. Most people don't, and the gift is yours either way for showing up.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_trust_legitimacy",
+    "objection": "How do I know you're really from [Resort]?",
+    "rebuttal": "Fair question — I can text you the resort's main number to verify, or you can hang up and call them direct. Either way, no pressure.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_trust_legitimacy",
+    "objection": "I didn't sign up for a phone call.",
+    "rebuttal": "When you scanned the QR, the next screen confirmed an immediate call — I'll text you a copy of exactly what you agreed to. Want me to remove you from the list?",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_trust_legitimacy",
+    "objection": "What company are you with again?",
+    "rebuttal": "I'm calling on behalf of [Resort Name] — Voxaris is the booking service they use. Happy to text you both numbers if you want to verify.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_trust_legitimacy",
+    "objection": "This feels like a robocall.",
+    "rebuttal": "I'm an AI booking assistant — but I'm only calling because you opted in by QR scan a few minutes ago. Want me to text you the booking link instead so you can do this on your own time?",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_trust_legitimacy",
+    "objection": "How did you scan the QR? I didn't.",
+    "rebuttal": "Hmm — let me double-check that with you. The scan came from [time] at [resort]. If that wasn't you, I'll remove your number right now and apologize for the mix-up.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_the_$75_deposit",
+    "objection": "I'm not putting my card down for something free.",
+    "rebuttal": "Totally fair — the $75 isn't a charge, it's a fully refundable hold to reserve your slot. The moment you check in for the tour, it releases. The resort does this because too many people no-show on free gifts.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_the_$75_deposit",
+    "objection": "Why $75 specifically?",
+    "rebuttal": "It's the resort's standard hold across their tour bookings — high enough to make sure people show up, low enough to be no big deal if you do.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_the_$75_deposit",
+    "objection": "What if I don't show up?",
+    "rebuttal": "If you no-show, the $75 is forfeited to cover the resort's prep cost. That's the only way you lose it — show up, you get it back.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_the_$75_deposit",
+    "objection": "Can I pay cash at the resort instead?",
+    "rebuttal": "Unfortunately not — they need a card on file to actually hold the slot. But it's only a hold, not a charge. You walk away with it back the moment you check in.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_the_$75_deposit",
+    "objection": "I'll do it at check-in.",
+    "rebuttal": "I hear you — but the slot doesn't actually hold without the deposit. Without it, someone else can grab your time. Want to lock it in now?",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_the_$75_deposit",
+    "objection": "What if my card gets compromised?",
+    "rebuttal": "Totally understand — I never see your card. You enter it on the keypad directly into the payment system, the same one most major retailers use. The resort doesn't store it either.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_the_$75_deposit",
+    "objection": "Can I use a debit card?",
+    "rebuttal": "For this one the resort needs a major credit card — Visa, Mastercard, Amex, or Discover. Debit and prepaid don't work for the hold.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_the_$75_deposit",
+    "objection": "I want to think about it before giving my card.",
+    "rebuttal": "Totally fair. I'll text you the booking link with the deposit step — you can lock it in whenever you're ready. Slots go fast though, so sooner is better.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_the_$75_deposit",
+    "objection": "Is the $75 in addition to anything else?",
+    "rebuttal": "Nope — that's it. Refundable hold, releases when you check in. There's no other charge from us.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_the_$75_deposit",
+    "objection": "What if my partner doesn't approve the deposit?",
+    "rebuttal": "I get it — want me to text you the link so you can both look at it together? You can finish the booking from the link any time before the slot fills.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_emotional_contextual",
+    "objection": "I'm exhausted, I just got off a flight.",
+    "rebuttal": "I bet — last thing you need is a sales call. Want me to text you the booking link so you can grab a slot when you're settled?",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_emotional_contextual",
+    "objection": "My wife will kill me if I sign us up for one of these.",
+    "rebuttal": "Got it — and to be clear, you're not signing up for anything except 90 minutes and a gift. Want me to text the details so you can show her exactly what it is?",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_emotional_contextual",
+    "objection": "My mother just passed and we're here for the funeral.",
+    "rebuttal": "I am so sorry. I'll close this out and you won't hear from us again. Take care.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_emotional_contextual",
+    "objection": "We're going through a divorce, this isn't a good time.",
+    "rebuttal": "Totally understood — I'll close this out. If your situation changes you've got the QR code. Take care.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_emotional_contextual",
+    "objection": "I'm in the middle of something.",
+    "rebuttal": "No problem — when's a better time, later today or tomorrow morning?",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_emotional_contextual",
+    "objection": "I don't speak English well.",
+    "rebuttal": "No problem — what language do you prefer? I can have someone who speaks it call you back tomorrow, or text you the booking link.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_emotional_contextual",
+    "objection": "I'm driving — I can't talk right now.",
+    "rebuttal": "Stay safe — I'll text you the link so you can book when you're parked. Talk soon.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_emotional_contextual",
+    "objection": "My kid is sick, I can't focus.",
+    "rebuttal": "I hope they feel better soon. I'll send you the booking link by text — handle it whenever you have a quiet minute.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_emotional_contextual",
+    "objection": "I just wanted the gift, not the tour.",
+    "rebuttal": "Totally understand — but the gift comes with the 90-minute preview. If that's not your vibe, no hard feelings, and I'll close this out.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_emotional_contextual",
+    "objection": "I scanned by accident.",
+    "rebuttal": "Totally fine — I'll remove your number right now. Sorry for the interruption, have a great rest of your day.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_compliance_landmines",
+    "objection": "Take me off your list.",
+    "rebuttal": "Absolutely — you're removed permanently. You won't hear from us again. Have a great day.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_compliance_landmines",
+    "objection": "Add me to the do-not-call list.",
+    "rebuttal": "Done — you're off our list and won't be contacted again. Goodbye.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_compliance_landmines",
+    "objection": "I never gave you permission to call me.",
+    "rebuttal": "I have you down as opting in via QR scan at [time and location]. If that's wrong, I'm taking you off the list right now and apologize for the mix-up.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_compliance_landmines",
+    "objection": "Is this call being recorded?",
+    "rebuttal": "Yes — for quality and compliance, as I mentioned at the start. I can stop the recording or end the call entirely if you'd prefer.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_compliance_landmines",
+    "objection": "I want to talk to a human.",
+    "rebuttal": "Of course — transferring you now. One moment.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_compliance_landmines",
+    "objection": "What's your company's address?",
+    "rebuttal": "Voxaris on behalf of [Resort Name], at [Address]. I can text it to you right now if you'd like.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_compliance_landmines",
+    "objection": "I'm going to report this call.",
+    "rebuttal": "Totally your right. For your reference, this is Voxaris on behalf of [Resort Name]. Removing you from our list now. Have a good day.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_compliance_landmines",
+    "objection": "I want a copy of my consent.",
+    "rebuttal": "Texting it to you right now — it'll show the time, your number, and exactly what you agreed to. Anything else I can do?",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_compliance_landmines",
+    "objection": "This call violates TCPA.",
+    "rebuttal": "I hear your concern. We have your QR-scan consent on record from [time]. I'll remove you from the list right now and you can email us if you'd like the consent record.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_compliance_landmines",
+    "objection": "Can you prove I opted in?",
+    "rebuttal": "Yes — texting your consent record now: time, IP address, and the exact language you agreed to. If anything looks off, I'll remove you immediately.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_hard_disqualifiers_edge_cases",
+    "objection": "Silence — caller doesn't respond for 4 seconds",
+    "rebuttal": "You still there? Take your time.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_hard_disqualifiers_edge_cases",
+    "objection": "Silence — caller doesn't respond for 8 seconds",
+    "rebuttal": "No worries if now's not a good time — want me to text you the booking link instead?",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_hard_disqualifiers_edge_cases",
+    "objection": "I bought from another resort last year.",
+    "rebuttal": "Got it — most resorts want a 6 to 12 month gap between tours. When did you tour and where? Some are more flexible than others on the timing.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_hard_disqualifiers_edge_cases",
+    "objection": "I attended a tour last month at another property.",
+    "rebuttal": "Most resorts want at least 6 months between tours. Sounds like you're inside that window — we'll have to skip this one, but feel free to scan the QR again next year.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_hard_disqualifiers_edge_cases",
+    "objection": "I'm a Wyndham/Marriott/Hilton owner already.",
+    "rebuttal": "Nice — that may actually qualify you for a different presentation track. Let me make a note and the resort team will route you to the owner-update version instead.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_hard_disqualifiers_edge_cases",
+    "objection": "My partner is back home, I'm here alone.",
+    "rebuttal": "Got it — for this offer, both decision-makers need to attend. Are you and your partner planning a future trip together we could schedule for instead?",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_hard_disqualifiers_edge_cases",
+    "objection": "We're not married — we're just friends.",
+    "rebuttal": "Totally fine — this offer is for cohabitating couples or married partners attending together. If you've got a partner at home you travel with, happy to look at a future trip.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_hard_disqualifiers_edge_cases",
+    "objection": "I live 15 minutes from this resort.",
+    "rebuttal": "That's actually outside what the resort can offer this preview to — they limit it to non-locals. I'll close this out, but appreciate you scanning.",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_hard_disqualifiers_edge_cases",
+    "objection": "What gift is it really? You're being vague.",
+    "rebuttal": "Fair — it's [specific incentive]. Want me to text you the exact offer terms before you commit?",
+    "source": "TOP_50_ELITE"
+  },
+  {
+    "category": "elite_hard_disqualifiers_edge_cases",
+    "objection": "Will you keep calling me if I don't show?",
+    "rebuttal": "No — one shot. If you no-show, the deposit covers it and we close out the lead. No follow-up calls.",
+    "source": "TOP_50_ELITE"
   }
 ]

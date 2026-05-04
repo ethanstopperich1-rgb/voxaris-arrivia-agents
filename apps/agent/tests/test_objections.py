@@ -13,8 +13,8 @@ from voxaris_agent.objections import (
 )
 
 
-def test_dataset_loads_100_entries() -> None:
-    assert count() == 100
+def test_dataset_loads_150_entries() -> None:
+    assert count() == 150
 
 
 def test_six_categories_present() -> None:

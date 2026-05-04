@@ -1,23 +1,20 @@
 [project]
-name = "voxaris-agent"
+name = "voxaris-andie"
 version = "0.0.1"
-description = "Voxaris VBA — LiveKit agent worker (Grok Voice via livekit-plugins-xai)"
+description = "Andie — Arrivia GVR Virtual Member Agent (LiveKit Cloud)"
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
 dependencies = [
   "livekit-agents==1.5.7",
-  "livekit-plugins-xai>=1.5",
   "livekit-plugins-silero>=1.5",
   "livekit-plugins-noise-cancellation>=0.2",
   "livekit-plugins-deepgram>=1.5",
   "livekit-plugins-rime>=1.5",
   "livekit-plugins-openai>=1.5",
+  "livekit-plugins-xai>=1.5",
   "livekit-api>=1.0",
   "python-dotenv>=1.0",
-  "supabase>=2.9",
   "httpx>=0.27",
-  "twilio>=9.3",
-  "stripe>=11.0",
   "pydantic>=2.9",
 ]
 
@@ -26,23 +23,21 @@ dev = [
   "pytest>=8.3",
   "pytest-asyncio>=0.24",
   "ruff>=0.7",
-  # python-docx is used by scripts that re-parse the source .docx into
-  # voxaris_agent/data/objections.json. Not required at runtime.
   "python-docx>=1.1",
 ]
 
 [project.scripts]
-vba-worker = "voxaris_agent.worker:cli"
+andie-worker = "voxaris_andie.worker:cli"
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["voxaris_agent*"]
+include = ["voxaris_andie*"]
 
 [tool.setuptools.package-data]
-"voxaris_agent.data" = ["*.json"]
+"voxaris_andie.data" = ["*.json"]
 
 [tool.ruff]
 line-length = 100
