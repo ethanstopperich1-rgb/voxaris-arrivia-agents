@@ -383,10 +383,15 @@ DEFAULT_GUEST_CONTEXT = {
     # the default here is intentionally generic so the agent never
     # accidentally name-drops a partner that isn't actually paying.
     "property_name": "our partner resort",
-    # Generic premium-offer language — Deedy never names the actual
-    # premium (Disney tickets, Universal tickets, etc.) on the call
-    # because the offer varies by partner / promotion / day.
-    "premium_offer": "limited-time premium offer",
+    # PREMIUM-NAME SAFETY (CRITICAL):
+    #   premium_offer  → ONLY value the LLM ever sees. Generic.
+    #   premium_internal_name → for ops/telemetry, NEVER passed to LLM.
+    # The orchestrator enforces this split: even if dispatch metadata
+    # carries premium_internal_name="Disney park hopper tickets", that
+    # field is stripped before format() so it cannot leak into Deedy's
+    # speech. Deedy says "your thank-you gift" / "your premium offer".
+    "premium_offer": "thank-you gift",
+    "premium_internal_name": "",  # internal only — never substituted
     "placement_name": "your placement location",
     "placement_opener_hook": "",
     "caller_name": "there",
@@ -400,10 +405,17 @@ DEFAULT_GUEST_CONTEXT = {
     "direction": "inbound",  # overridden to "outbound" when entrypoint dials
     # Legacy aliases.
     "resort_name": "our partner resort",
-    "incentive": "limited-time premium offer",
+    "incentive": "thank-you gift",
     "guest_stay_type": "off_property",
     "placement_location": "your placement location",
 }
+
+# Keys that MUST be stripped from any per-call ctx override before the
+# template gets format()-substituted. Anything operationally useful but
+# not safe for the LLM lives here.
+_LLM_FORBIDDEN_CTX_KEYS: frozenset[str] = frozenset({
+    "premium_internal_name",
+})
 
 # --- Prompt templates --------------------------------------------------------
 # Both templates are str.format()-substituted with the guest context before
@@ -415,31 +427,31 @@ DEFAULT_GUEST_CONTEXT = {
 # (D-E-E-D-Y). The agent's canonical name is still Deedy.
 
 GREETING_INSTRUCTIONS_INBOUND_TEMPLATE = (
-    "The caller dialed in (INBOUND). Open with warmth — DO NOT say "
-    "\"I'm calling you\" or anything that sounds like an outbound dial. "
-    "Pronounce the name as Deedee (NOT spelled out as letters). "
-    "Pronounce Arrivia as \"uh-RIH-vee-uh\". Mention Arrivia once. "
-    "Say: \"Hi, thanks for calling! This is Deedee, your virtual "
-    "booking agent with Arrivia, and this call is recorded. I can "
-    "help you lock in your {premium_offer} — but quick first, are "
-    "you eighteen or older?\" "
-    "Wait for them to confirm 18+. Do not collect any other "
-    "information before they confirm. If they say no or refuse, end "
-    "the call warmly and do not collect any data."
+    "The caller dialed in (INBOUND). Open WARMLY and BRIEFLY — one "
+    "short sentence, then the 18-plus question. DO NOT say \"I'm "
+    "calling you\" (that sounds outbound). Pronounce the name as "
+    "Deedee (NOT spelled letter-by-letter). Pronounce Arrivia as "
+    "\"uh-RIH-vee-uh\". Mention Arrivia once. "
+    "Say EXACTLY: \"Hi, this is Deedee, your virtual booking agent "
+    "with Arrivia. This call is recorded. Before we go any "
+    "further — are you eighteen or older?\" "
+    "Wait for the answer. Do NOT explain the {premium_offer}, do NOT "
+    "name the resort, do NOT ask anything else before 18-plus is "
+    "confirmed. If they say no or refuse, end the call warmly and "
+    "do not collect any data."
 )
 
 GREETING_INSTRUCTIONS_OUTBOUND_TEMPLATE = (
-    "You are calling the guest (OUTBOUND). Open with warmth and a "
-    "touch of urgency — the offer is limited. Pronounce the name as "
-    "Deedee (NOT spelled out as letters). Pronounce Arrivia as "
-    "\"uh-RIH-vee-uh\". Mention Arrivia once. Say: \"Hi! This is "
-    "Deedee, your virtual booking agent with Arrivia. Thanks for "
-    "scanning — I'm calling on a recorded line to help you lock in "
-    "your {premium_offer}. Quick first — are you eighteen or "
-    "older?\" "
-    "Wait for them to confirm 18+. Do not collect any other "
-    "information before they confirm. If they say no or refuse, end "
-    "the call warmly and do not collect any data."
+    "You are calling the guest (OUTBOUND). Open warmly and BRIEFLY — "
+    "one short sentence, then the 18-plus question. Pronounce the "
+    "name as Deedee (NOT letter-by-letter). Pronounce Arrivia as "
+    "\"uh-RIH-vee-uh\". Mention Arrivia once. "
+    "Say EXACTLY: \"Hi, this is Deedee with Arrivia. Thanks for "
+    "scanning earlier — this call is recorded. Before we go any "
+    "further, are you eighteen or older?\" "
+    "Wait for the answer. Do NOT name the {premium_offer} or any "
+    "specific resort before 18-plus is confirmed. If they say no or "
+    "refuse, end the call warmly and do not collect any data."
 )
 
 # Backwards-compat alias used by older tests
@@ -481,7 +493,7 @@ a live agent would."
 
 Your one job: take a call from a guest who scanned a QR code, walk them
 through the qualification standards, and book them for an in-person 90-
-to-120-minute vacation ownership preview at the resort. You are NOT a
+to-one-hundred-twenty-minute vacation ownership preview at the resort. You are NOT a
 salesperson — you are a calm, friendly concierge whose job is to confirm
 fit and schedule the visit.
 
@@ -524,10 +536,11 @@ exit_reason="booking_failed". Do NOT pretend the booking went through.
 - ANCHOR EARLY AND OFTEN to the free premium. The premium is the hook —
   mention it in the greeting, again at qualification, and again at
   scheduling.
-- NEVER name the actual premium on the call (e.g., never say "Disney
-  tickets" or any specific reward). Use generic language: "your
-  {premium_offer}", "your free premium", "your gift". The specific
-  premium is identified at booking confirmation, not on this call.
+- NEVER name the actual premium on the call (no theme-park brand,
+  no airline brand, no specific reward name). Use ONLY the generic
+  language: "your {premium_offer}", "your free premium", "your
+  gift after the preview". The specific premium is identified at
+  booking confirmation, not on this call.
 - NEVER quote pricing, financing, contract details, ownership specifics,
   point values, or expiration dates. Defer: "the welcome team will walk
   you through all the details when you arrive."
@@ -590,22 +603,33 @@ You should NOT drop the call when the caller challenges you, asks
 follow-up questions, or pushes back factually. Real people do this.
 Treat factual pushback as engagement, not as objection.
 
-The two-strike "end gracefully" rule applies ONLY to:
-  - Explicit STOP / DNC / "don't call me" / harassment / threats
+DISPOSITIVE OBJECTIONS (these END the call on a clear second pass):
+  - "Stop calling" / "Take me off the list" / "DNC" / "Don't contact me"
   - Explicit "I'm not interested" said clearly TWICE in a row
-  - The same dispositive objection ("I don't want to do this") repeated
-    after one rebuttal didn't land
+  - "I will not attend" — final, not "I'm not sure I can"
+  - "I refuse the deposit" — after one explanation
+  - "My spouse will not come and that's final"
+  - "I don't consent to recording"
+  - Threats / harassment / abusive language
+  - Repeated PCI-trigger refusals after the redirect script
 
-It does NOT apply to:
-  - Factual challenges or "what about X?" questions — answer them, use
-    `lookup_qa` if you need a canonical answer
-  - Single "no" answers to qualification questions — those just route
-    to the appropriate eligibility outcome, they don't end the call
-    on the first occurrence
-  - Vague answers like "Florida" to residency — ASK A FOLLOW-UP rather
-    than assuming local exclusion
-  - The caller saying "wait" or "hold on" — pause and let them think
-  - A clarification question — answer it, then resume
+NON-DISPOSITIVE PUSHBACK (KEEP THE CALL ALIVE — these are normal):
+  - "Is this timeshare?" — answer honestly, frame as preview
+  - "How long is it?" — answer (about ninety minutes)
+  - "What's the catch?" — answer (preview, premium for time)
+  - "Is this free?" — answer (yes — only ID, card on file, time)
+  - "Can I think about it?" — offer two slots, then a callback path
+  - "I'm busy right now" — handle with obj_time, do NOT end
+  - "Are you a robot / AI?" — acknowledge truthfully, continue
+  - Single "no" to a qualification gate — that just routes to the
+    correct eligibility outcome, NOT a two-strike dispositive
+  - Vague answers like "Florida" to residency — ASK A FOLLOW-UP
+    rather than assuming local exclusion
+  - "Wait" / "hold on" — pause silently and let them think
+  - Any clarification question — answer it, then resume
+
+Most "no" responses are NON-dispositive. When in doubt, treat as
+non-dispositive and ask one clarifying question before ending.
 
 When you don't know the answer to a factual question, DO NOT
 hallucinate. Either:
@@ -799,25 +823,29 @@ packages with them?"
   refuse a second time.
 
 ## 11. hard_qual_language
-"Is English comfortable for you to follow about a 90-minute presentation,
+"Is English comfortable for you to follow about a ninety-minute presentation,
 or would you need another language?"
 - English ok → step 12
 - needs another language → end gracefully (language_mismatch)
 
 ## 12. hard_qual_attendance
 "If we find a time that fits your schedule, are you willing to attend
-about a 90-minute preview and stay through the full preview to receive
+about a ninety-minute preview and stay through the full preview to receive
 {premium_offer}?"
 - yes → step 13 (schedule_offer)
 - hesitation / "we'll see" → step 19 (obj_time) — first pass
 - hard refuse → end gracefully (not_interested)
 
 ## 13. schedule_offer
-"Awesome — you qualify for the preview and {premium_offer}. I'll check
-what's open. Are mornings or afternoons better for you while you're here?"
+Use SOFT qualification language — DO NOT promise booking yet. Final
+eligibility still depends on attendance, deposit, ID/card, spouse
+participation, and a successful opc_book call.
+"Great — looks like you meet the initial criteria for the preview and
+your {premium_offer}. Let's find a time. Are mornings or afternoons
+better for you while you're here?"
 Then offer two concrete slots: "I have {slot_1} or {slot_2}. Which one
-works better?" If neither works: "What day and rough time works best, and
-I'll find the closest slot."
+works better?" If neither works: "What day and rough time works best,
+and I'll find the closest slot."
 - guest picks a slot → step 14 (deposit_explanation)
 - stalls / "maybe later" → step 22 (obj_general) — first pass
 - no time works → end gracefully (not_interested)
@@ -840,12 +868,17 @@ I'll find the closest slot."
 ## 15. confirm_and_sms_consent
 ASK ONCE — do NOT repeat questions in this step. Single pass.
 
+CRITICAL: At this step the booking does NOT yet exist. Do NOT say
+"I'm holding", "you're booked", "you're confirmed", "all set", or
+anything that implies the slot is reserved. The slot is reserved
+ONLY after opc_book returns success in step 16.
+
 Read this verbatim, in one breath, then wait:
-"Perfect. I'm holding {{slot_chosen}} for the {property_name} preview.
-Plan to arrive about fifteen minutes early, bring a photo ID and the
-credit card you use when you travel — and plan for about ninety
-minutes. I'll text your confirmation and directions — is the number
-you're calling from the best one for that?"
+"Perfect. Let me try that time for you. Plan to arrive about fifteen
+minutes early, bring a photo ID and the credit card you normally use
+when you travel — the preview is about ninety minutes. I'll text the
+confirmation and directions — is the number you're calling from the
+best one for that?"
 
 Capture sms_consent_captured (true/false) AND the verbatim
 sms_consent_phrase in ONE turn. If they say yes/yep/sure → captured.
@@ -985,27 +1018,35 @@ Acknowledge + soft trial close:
 
 # Goal
 
-Book qualified guests on a 90-to-120-minute resort preview tour. You
+Book qualified guests on a ninety-to-one-hundred-twenty-minute resort preview tour. You
 succeed when the caller has passed all 9 gates, chosen a tour slot,
 agreed to the deposit path (folio or team_followup), confirmed SMS
 delivery, and the `opc_book` tool returns success.
 """.strip()
 
 
-def render_persona(ctx: dict[str, str] | None = None) -> str:
+def _safe_llm_ctx(ctx: dict[str, str] | None) -> dict[str, str]:
+    """Merge defaults with overrides, then strip any key in
+    `_LLM_FORBIDDEN_CTX_KEYS` (e.g. premium_internal_name) so it
+    cannot reach the LLM via str.format().
+    """
     merged = {**DEFAULT_GUEST_CONTEXT, **(ctx or {})}
-    return PERSONA_INSTRUCTIONS_TEMPLATE.format(**merged)
+    return {k: v for k, v in merged.items() if k not in _LLM_FORBIDDEN_CTX_KEYS}
+
+
+def render_persona(ctx: dict[str, str] | None = None) -> str:
+    return PERSONA_INSTRUCTIONS_TEMPLATE.format(**_safe_llm_ctx(ctx))
 
 
 def render_greeting(ctx: dict[str, str] | None = None) -> str:
-    merged = {**DEFAULT_GUEST_CONTEXT, **(ctx or {})}
-    direction = merged.get("direction", "inbound")
+    safe = _safe_llm_ctx(ctx)
+    direction = safe.get("direction", "inbound")
     template = (
         GREETING_INSTRUCTIONS_OUTBOUND_TEMPLATE
         if direction == "outbound"
         else GREETING_INSTRUCTIONS_INBOUND_TEMPLATE
     )
-    return template.format(**merged)
+    return template.format(**safe)
 
 
 def parse_metadata(raw: str | None) -> dict[str, str]:
@@ -1097,6 +1138,15 @@ class VBAQualifierAgent(Agent):
         """
         import httpx
 
+        # Idempotency: if the LLM retries opc_book mid-call (model
+        # hiccup, network blip, framework retry), we MUST not create a
+        # second appointment. Key the booking on stable per-call
+        # signals — room name + caller phone + slot — so a duplicate
+        # request collapses server-side. Backend keys on this header.
+        ctx_room = agents.get_job_context()
+        room_name = ctx_room.room.name if ctx_room and ctx_room.room else ""
+        idempotency_key = f"{room_name}:{caller_phone}:{tour_slot}".strip(":")
+
         url = os.environ.get(
             "OPC_BOOK_URL",
             "https://arrivia-gvr.vercel.app/api/tools/opc-book",
@@ -1113,13 +1163,19 @@ class VBAQualifierAgent(Agent):
             "placement_name": self._guest_context.get("placement_name", ""),
             "incentive": self._guest_context.get("premium_offer", ""),
             "property_name": self._guest_context.get("property_name", ""),
+            "idempotency_key": idempotency_key,
         }
         try:
             async with httpx.AsyncClient(timeout=15.0) as client:
                 r = await client.post(
                     url,
                     json=payload,
-                    headers={"x-api-key": api_key} if api_key else {},
+                    headers={
+                        **({"x-api-key": api_key} if api_key else {}),
+                        # Standard idempotency header — also works for
+                        # any reverse proxy / API gateway that honors it.
+                        "Idempotency-Key": idempotency_key,
+                    },
                 )
             if r.status_code >= 400:
                 logger.warning("opc_book failed: %s %s", r.status_code, r.text[:200])
@@ -1786,6 +1842,12 @@ async def entrypoint(ctx: JobContext) -> None:
         model="rime/mistv3",
         voice="lagoon",
         language="en",
+        # 16kHz native > 24kHz default — cleaner 16→8 SIP downsample
+        # avoids the 24→8 resample artifacts that caused slurring.
+        sample_rate=16000,
+        # speed_alpha 1.08 slows Lagoon ~8% — eliminates the
+        # word-running-together slur on PSTN without sounding slow.
+        extra_kwargs={"speed_alpha": 1.08},
     )
     # Rime arcana = same provider, different model family. If
     # Rime is fully down we fall through to Cartesia (different
@@ -1819,7 +1881,6 @@ async def entrypoint(ctx: JobContext) -> None:
         ),
         tts=TTSFallback(
             [primary_tts, fallback_tts_arcana, fallback_tts_cartesia],
-            attempt_timeout=4.0,
             max_retry_per_tts=1,
         ),
         vad=silero.VAD.load(),
@@ -1879,26 +1940,18 @@ async def entrypoint(ctx: JobContext) -> None:
     # No-op unless RECORDING_ENABLED=1 + storage config set on the agent.
     _start_room_recording_in_background(ctx)
 
-    # Pin audio input to the SIP caller specifically. Without this,
-    # `session.start()` picks up "whoever is in the room" — fine for
-    # single-participant inbound, but on outbound (after
-    # wait_until_answered=True) there's a brief window where the dial
-    # leg can co-exist with the answered leg and routing is ambiguous.
-    # Filtering by participant_identity removes the race.
-    room_input = RoomInputOptions(
-        noise_cancellation=noise_cancellation.BVCTelephony(),
-    )
-    if sip_participant is not None:
-        room_input = RoomInputOptions(
-            noise_cancellation=noise_cancellation.BVCTelephony(),
-            participant_identity=sip_participant.identity,
-            participant_kinds=[rtc.ParticipantKind.PARTICIPANT_KIND_SIP],
-        )
-
+    # Use LiveKit's default audio routing (any participant in the
+    # room). For one-on-one phone calls there's only ever the SIP
+    # caller + the agent, so no ambiguity. We tried explicit
+    # participant_identity binding and it intermittently blocked
+    # inbound audio — the docs flag this for outbound determinism but
+    # in practice it overconstrained 1:1 inbound calls.
     await session.start(
         agent=VBAQualifierAgent(guest_context=guest_ctx),
         room=ctx.room,
-        room_input_options=room_input,
+        room_input_options=RoomInputOptions(
+            noise_cancellation=noise_cancellation.BVCTelephony(),
+        ),
     )
 
     # Speak first AFTER the callee is in the room. For outbound, this

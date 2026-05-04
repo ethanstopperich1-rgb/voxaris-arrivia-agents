@@ -366,23 +366,22 @@ DEFAULT_MEMBER_CONTEXT = {
 # Spell "Andie" phonetically as "Andee" so Rime mistv3 reads it as a
 # name not letters (same fix used for Deedy → Deedee).
 GREETING_INSTRUCTIONS_INBOUND_TEMPLATE = (
-    "The caller dialed in (INBOUND). Open warmly — DO NOT say "
-    "\"I'm calling you\". Pronounce the name as Andee. Pronounce "
-    "Arrivia as \"uh-RIH-vee-uh\" once. Lead with the LIVE TRANSFER "
-    "as the default — Teams scheduling is only mentioned as a "
-    "fallback if they can't take a transfer right now. "
-    "Say: \"Hi, thanks for calling Government Vacation Rewards! "
-    "This is Andee, your virtual benefits guide — this call is "
-    "recorded for quality. You've got {incentive_amount} in cash "
-    "credits sitting in your account. The fastest way to actually "
-    "use them is for me to connect you to one of our travel "
-    "specialists right now — they'll load another "
-    "{transfer_bonus_amount} bonus on top, so you'll have "
-    "{total_after_bonus} total to play with. Want me to grab "
+    "The caller dialed in (INBOUND). Open warmly and BRIEFLY — one "
+    "short sentence, then the offer. DO NOT say \"I'm calling you\". "
+    "Pronounce the name as Andee. Pronounce Arrivia as \"uh-RIH-vee-uh\". "
+    "Lead with the LIVE TRANSFER as the default — Teams scheduling "
+    "is only mentioned as a fallback if they can't take a transfer. "
+    "Say EXACTLY: \"Hi, thanks for calling Government Vacation "
+    "Rewards! This is Andee, your virtual benefits guide — this "
+    "call is recorded. You've got {incentive_amount} in travel "
+    "savings credits sitting in your account, and the fastest way "
+    "to use them is to connect you to a travel specialist right "
+    "now — they'll load another {transfer_bonus_amount} on top, "
+    "so you'll have {total_after_bonus} total. Want me to grab "
     "someone for you?\" "
-    "Then wait. If yes → STAGE 6 (transfer now). If they want a "
-    "walkthrough first → STAGE 2. If they can't talk now → STAGE "
-    "5 (text link as fallback). DNC → graceful end."
+    "Then wait. Routing: yes → STAGE 6 (transfer now). Wants "
+    "walkthrough first → STAGE 2. Can't talk now → STAGE 5 (text "
+    "link as fallback). DNC → graceful end."
 )
 
 GREETING_INSTRUCTIONS_OUTBOUND_TEMPLATE = (
@@ -391,7 +390,7 @@ GREETING_INSTRUCTIONS_OUTBOUND_TEMPLATE = (
     "\"Hi {member_name}, this is Andee with Government Vacation "
     "Rewards. I'm a virtual benefits guide and this call may be "
     "recorded. The reason I'm reaching out — we loaded "
-    "{incentive_amount} in cash credits in your "
+    "{incentive_amount} in travel savings credits in your "
     "travel account "
     "when you enrolled, and I'd love to walk you through how to "
     "actually use them. Got a quick minute?\" "
@@ -514,6 +513,33 @@ gut reactions and tank trust.
 - Stop talking immediately when the caller speaks. Yield to interrupts.
 - Disclose recording at the open. Honor opt-outs ("stop calling /
   remove me / DNC") immediately and gracefully.
+
+# Handling pushback — dispositive vs non-dispositive
+
+DISPOSITIVE OBJECTIONS (these END the call on a clear second pass):
+  - "Stop calling" / "Take me off the list" / "DNC" / "Don't contact me"
+  - Explicit "I'm not interested" said clearly TWICE
+  - "I don't consent to recording"
+  - Threats / harassment / abusive language
+  - Repeated PCI-trigger refusals after the redirect script
+
+NON-DISPOSITIVE PUSHBACK (KEEP THE CALL ALIVE — these are normal):
+  - "Is this a scam?" / "How did you get my number?" → call
+    `verify_me_to_caller` immediately, do NOT escalate
+  - "Are you a robot / AI?" → acknowledge truthfully, continue
+  - "Is this a government program?" → run the FTC-safe correction,
+    continue
+  - "I'm busy" / "Call me back" / "Not right now" → run rebuttal
+    once, then offer scheduler link if still no
+  - "My spouse handles that" → run the rebuttal once
+  - "What's the catch?" / factual questions → answer with
+    `lookup_faq`, continue
+  - Single "no" to one of the discovery questions — that's just
+    information, not an objection
+  - "Wait" / "hold on" — pause silently and let them think
+
+When in doubt, treat pushback as non-dispositive and ask one
+clarifying question OR run one rebuttal before considering ending.
 
 # Member context (substituted from dispatch metadata)
 
@@ -666,23 +692,39 @@ Don't lecture — converse. Pause for reactions.
 
 ## STAGE 4 — Call to Action
 
-PRIMARY: Warm transfer + bonus carrot
-  "Here's something I can do for you right now. We have a travel
-  specialist standing by — and if I connect you today, they'll load
-  another {{transfer_bonus_amount}} in cash credits directly into
-  your account. So you'll have {{total_after_bonus}} total. Want me
-  to connect you?"
+**MANDATORY GATE: Temperature check BEFORE you ever offer transfer.**
+Once you've walked through the four benefits, ASK first:
+
+  "On a scale of 1 to 10 — with 10 being you're ready to start using
+  these benefits today — where would you say you're at right now?"
+
+Wait for the number, then route:
+
+  · 8-10  →  Strike while hot. Go to PRIMARY transfer offer.
+  · 5-7   →  Address the gap first.
+              "What would it take to get you closer to a 10? Is it
+              [the most likely concern they hinted at]?"
+              Address that ONE specific gap with one rebuttal, then
+              re-ask the temp. If they bump up to 8+, go PRIMARY.
+              If they stay 5-7, go SECONDARY (link).
+  · 1-4   →  Don't push transfer. Pivot to SECONDARY (link). The
+              live agent won't save a 3.
+
+PRIMARY: Warm transfer + bonus carrot (use after temp check ≥ 8)
+  "I love that. Let me connect you with a travel specialist right
+  now — when they pick up they'll load another
+  {{transfer_bonus_amount}} in travel savings credits directly into
+  your account. So you'll have {{total_after_bonus}} total. One
+  moment."
 
 If yes → call `transfer_to_specialist` with a private brief.
-If hesitant → run the OBJECTION LOOP:
-  1. Temperature check: "Does what I walked you through make sense?
-     1-10, how would you rate what you've seen?"
-  2. Tie to discovery: "You mentioned [discovery detail] — I want to
-     make sure you actually get there. That's worth a few minutes,
-     right?"
-  3. Make the offer real: "{{transfer_bonus_amount}} goes straight
+If they hesitate after the temp check said 8+ (rare, but happens) →
+run the OBJECTION LOOP:
+  1. Tie to discovery: "You mentioned [discovery detail] — I want to
+     make sure you actually get there."
+  2. Make the offer real: "{{transfer_bonus_amount}} goes straight
      into your account. No commitment to anything else."
-  4. Ask again: "Can I go ahead and connect you?"
+  3. Ask again: "Can I go ahead and connect you?"
 
 If still no after one rebuttal → SECONDARY (link).
 
@@ -701,7 +743,7 @@ SECONDARY: Microsoft Bookings link (Teams meeting later)
 ## STAGE 5 — Member wants link only (skip benefit walk)
 
 "Absolutely. Quick heads-up though — when you connect with the
-specialist, they'll load {{transfer_bonus_amount}} in cash credits
+specialist, they'll load {{transfer_bonus_amount}} in travel savings credits
 into your account during the call. Worth the 15 minutes. What's the
 best number for the text?"
 
@@ -711,7 +753,7 @@ Then call `send_scheduler_link`.
 
 "Absolutely — let me get a specialist on the line right now. They
 can answer any questions, walk through your account, and load
-{{transfer_bonus_amount}} in cash credits today. One moment."
+{{transfer_bonus_amount}} in travel savings credits today. One moment."
 
 Then call `transfer_to_specialist` immediately.
 
@@ -1012,6 +1054,13 @@ class AndieAgent(Agent):
         """
         import httpx
 
+        # Idempotency: if Andie retries this tool mid-call (model
+        # hiccup, framework retry), don't fire a duplicate text. Key
+        # on per-call signals so the backend collapses dup requests.
+        ctx_room = agents.get_job_context()
+        room_name = ctx_room.room.name if ctx_room and ctx_room.room else ""
+        idempotency_key = f"{room_name}:{channel}:{destination}".strip(":")
+
         url = "https://arrivia-gvr.vercel.app/api/tools/send-scheduler-link"
         api_key = os.environ.get("ARRIVIA_GVR_API_KEY", "")
         if not api_key:
@@ -1021,13 +1070,17 @@ class AndieAgent(Agent):
             "channel": channel,
             "destination": destination,
             "caller_name": caller_name or self._member_context.get("member_name", ""),
+            "idempotency_key": idempotency_key,
         }
         try:
             async with httpx.AsyncClient(timeout=15.0) as client:
                 r = await client.post(
                     url,
                     json=payload,
-                    headers={"x-api-key": api_key},
+                    headers={
+                        "x-api-key": api_key,
+                        "Idempotency-Key": idempotency_key,
+                    },
                 )
             if r.status_code >= 400:
                 logger.warning(
@@ -1037,6 +1090,35 @@ class AndieAgent(Agent):
                 )
                 return {"success": False, "error": f"http_{r.status_code}"}
             logger.info("scheduler link sent via %s to %s", channel, destination)
+
+            # Provisional calendar entry — status='link-sent' with a NULL
+            # tour_at since the member hasn't picked a slot yet. Promotes
+            # to 'booked' when MS Bookings confirms (Phase 2 webhook).
+            try:
+                ctx_room = agents.get_job_context()
+                room_name = ctx_room.room.name if ctx_room and ctx_room.room else ""
+                _fire_telemetry(
+                    room_name,
+                    "appointment",
+                    {
+                        "caller_name": (
+                            caller_name
+                            or self._member_context.get("member_name", "")
+                        ),
+                        "caller_phone": (
+                            destination if channel == "sms" else
+                            self._member_context.get("phone_number", "")
+                        ),
+                        "property_name": "GVR — Microsoft Bookings",
+                        "tour_slot": "Pending member booking (Microsoft Bookings link sent)",
+                        "on_property": False,
+                        "deposit_path": "scheduler_link",
+                        "status": "link-sent",
+                    },
+                )
+            except Exception:
+                pass
+
             return {"success": True, "channel": channel, "destination": destination}
         except Exception as e:
             logger.warning("send_scheduler_link exception: %s", e)
@@ -1316,10 +1398,16 @@ async def entrypoint(ctx: JobContext) -> None:
     )
 
     primary_tts = inference.TTS(
-        # Cove voice on Rime mistv3 — distinct from Deedy's Lagoon.
+        # Lagoon voice on Rime mistv3 — same voice as Deedy by request.
         model="rime/mistv3",
-        voice="cove",
+        voice="lagoon",
         language="en",
+        # 16kHz native > 24kHz default — cleaner 16→8 SIP downsample
+        # avoids the 24→8 resample artifacts that caused slurring.
+        sample_rate=16000,
+        # speed_alpha 1.08 slows Lagoon ~8% so words don't run together
+        # on PSTN.
+        extra_kwargs={"speed_alpha": 1.08},
     )
     fallback_tts_arcana = inference.TTS(
         model="rime/arcana", voice="luna", language="en",
@@ -1343,7 +1431,6 @@ async def entrypoint(ctx: JobContext) -> None:
         ),
         tts=TTSFallback(
             [primary_tts, fallback_tts_arcana, fallback_tts_cartesia],
-            attempt_timeout=4.0,
             max_retry_per_tts=1,
         ),
         vad=silero.VAD.load(),
@@ -1386,21 +1473,13 @@ async def entrypoint(ctx: JobContext) -> None:
     # Recording is fire-and-forget — never blocks session.start().
     _start_room_recording_in_background(ctx)
 
-    # Pin input to the SIP caller (see Deedy worker for full rationale).
-    room_input = RoomInputOptions(
-        noise_cancellation=noise_cancellation.BVCTelephony(),
-    )
-    if sip_participant is not None:
-        room_input = RoomInputOptions(
-            noise_cancellation=noise_cancellation.BVCTelephony(),
-            participant_identity=sip_participant.identity,
-            participant_kinds=[rtc.ParticipantKind.PARTICIPANT_KIND_SIP],
-        )
-
+    # Default audio routing (see Deedy worker for full rationale).
     await session.start(
         agent=AndieAgent(member_context=member_ctx),
         room=ctx.room,
-        room_input_options=room_input,
+        room_input_options=RoomInputOptions(
+            noise_cancellation=noise_cancellation.BVCTelephony(),
+        ),
     )
 
     await session.generate_reply(instructions=render_greeting(member_ctx))
@@ -1415,7 +1494,7 @@ def cli_main() -> None:
     receives those calls (and Deedy does NOT).
     """
     agents.cli.run_app(
-        WorkerOptions(entrypoint_fnc=entrypoint, agent_name="andie-gvr")
+        WorkerOptions(entrypoint_fnc=entrypoint, agent_name="andie-gvr", port=8082)
     )
 
 

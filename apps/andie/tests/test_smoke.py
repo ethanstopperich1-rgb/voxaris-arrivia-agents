@@ -77,12 +77,13 @@ def test_qa_loaded() -> None:
     assert count() > 0
 
 
-def test_objections_loaded_84_entries() -> None:
-    """Per Grok multi-source research: 84 objections across 10
-    categories, far more than the 5 in the original Transfer Script."""
+def test_objections_loaded_89_entries() -> None:
+    """89 entries: 84 from Grok multi-source research + 5 added
+    2026-05-04 from human-rep transcript review (spouse / don't-
+    remember / send-email-instead / no-time / can't-afford)."""
     from voxaris_andie.objections import categories, count
 
-    assert count() == 84
+    assert count() == 89
     cats = set(categories())
     expected = {
         "skepticism_trust", "time_pressure", "travel_fit", "cost_value",
