@@ -1871,11 +1871,10 @@ async def entrypoint(ctx: JobContext) -> None:
     )
 
     primary_tts = inference.TTS(
-        # Cove voice on Rime mistv3 — more mature/grounded than
-        # Lagoon (test feedback: lagoon sounded too young, lacked
-        # energy on PSTN). Cove tested as warm + mid-range female.
-        model="rime/mistv3",
-        voice="cove",
+        # Celeste voice on Rime Arcana — Arcana model family for
+        # warmer, more natural prosody than mistv3 on PSTN.
+        model="rime/arcana",
+        voice="celeste",
         language="eng",
         # 16kHz native > 24kHz default — cleaner 16→8 SIP downsample
         # avoids the 24→8 resample artifacts that caused slurring.
