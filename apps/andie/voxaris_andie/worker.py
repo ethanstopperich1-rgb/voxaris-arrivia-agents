@@ -1487,10 +1487,10 @@ async def entrypoint(ctx: JobContext) -> None:
     )
 
     primary_tts = inference.TTS(
-        # Peak voice on Rime mistv3 — distinct from Deedy's mistv3
+        # Steppe voice on Rime mistv3 — distinct from Deedy's mistv3
         # cove so members can tell the two agents apart.
         model="rime/mistv3",
-        voice="peak",
+        voice="steppe",
         language="eng",
         # 16kHz native > 24kHz default — cleaner 16→8 SIP downsample
         # avoids the 24→8 resample artifacts that caused slurring.
