@@ -411,8 +411,13 @@ DEFAULT_GUEST_CONTEXT = {
     "caller_phone": "your number",
     # IMPORTANT: slot_1 / slot_2 should be passed per-call as REAL dates
     # ("Sunday the fourth at ten thirty AM"), not generic "tomorrow".
-    "slot_1": "tomorrow morning",
-    "slot_2": "tomorrow afternoon",
+    # Realistic preview-tour times: 7:30, 8:30, 9:30 AM are the
+    # actual morning slots; 1:00 / 2:00 PM are the afternoon
+    # options. The orchestrator should compute next bookable slots
+    # at these times. Defaults reflect what Deedy ACTUALLY offers
+    # so test calls don't lead with unrealistic times like 10:30AM.
+    "slot_1": "tomorrow at eight thirty AM",
+    "slot_2": "tomorrow at one thirty PM",
     "on_property": "unknown",
     "platform_brand": "Arrivia",
     "platform_brand_phonetic": "uh-RIH-vee-uh",
@@ -816,8 +821,11 @@ elements:
                    dollar refundable deposit."
 - Premium anchor: "Your {premium_offer} are tied to completing the
   full preview."
-- Warm sign-off: "Thanks so much for your time, {caller_first_name}
-  — enjoy the rest of your stay at {property_name}."
+- Warm sign-off: ALWAYS say the guest's first name twice on close —
+  once at the top of the close, once at the very end. Pattern:
+  "All set, {caller_first_name}." ... [the rest of the close] ...
+  "Thanks so much for your time, {caller_first_name} — have a great
+  rest of your day."
 
 Wait briefly for any final response (1–2 seconds). If they say
 "thanks" or "bye", reply naturally ("You're welcome — take care!"),
@@ -841,9 +849,13 @@ Pick the right phrasing for the exit_reason that brought you here:
   appreciate you chatting with me. Enjoy the rest of your stay."
 - recording_or_ai_objection: "Absolutely — I'll close this out
   right now. Enjoy your day."
-- booking_failed: "I'm sorry — I'm having trouble locking that in
-  on my end. A {property_name} team member will reach out to you
-  to finalize. Thanks for your patience."
+- booking_failed: ALWAYS use this exact callback fallback phrasing.
+  Use the guest's first name TWICE — once near the start, once at
+  the very end of the close:
+  "I'm having trouble reaching a live agent right now,
+  {caller_first_name}. Would it be okay if I have one call you back
+  as soon as they're available? Thanks so much for your time,
+  {caller_first_name} — have a great rest of your day."
 - deposit_refused: "No problem at all. The deposit is required to
   hold the slot, but a {property_name} team member can talk you
   through the full details. Thanks for your time."
@@ -1859,9 +1871,12 @@ async def entrypoint(ctx: JobContext) -> None:
     )
 
     primary_tts = inference.TTS(
+        # Cove voice on Rime mistv3 — more mature/grounded than
+        # Lagoon (test feedback: lagoon sounded too young, lacked
+        # energy on PSTN). Cove tested as warm + mid-range female.
         model="rime/mistv3",
-        voice="lagoon",
-        language="en",
+        voice="cove",
+        language="eng",
         # 16kHz native > 24kHz default — cleaner 16→8 SIP downsample
         # avoids the 24→8 resample artifacts that caused slurring.
         sample_rate=16000,
