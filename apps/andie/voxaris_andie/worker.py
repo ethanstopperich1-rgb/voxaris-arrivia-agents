@@ -1487,11 +1487,10 @@ async def entrypoint(ctx: JobContext) -> None:
     )
 
     primary_tts = inference.TTS(
-        # Lyra voice on Rime Arcana — note: Arcana model, not mistv3.
-        # Distinct from Deedy's mistv3/cove so members can tell the
-        # two agents apart immediately.
-        model="rime/arcana",
-        voice="lyra",
+        # Peak voice on Rime mistv3 — distinct from Deedy's mistv3
+        # cove so members can tell the two agents apart.
+        model="rime/mistv3",
+        voice="peak",
         language="eng",
         # 16kHz native > 24kHz default — cleaner 16→8 SIP downsample
         # avoids the 24→8 resample artifacts that caused slurring.
