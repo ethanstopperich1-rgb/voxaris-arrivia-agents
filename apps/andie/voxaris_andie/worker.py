@@ -369,7 +369,7 @@ DEFAULT_MEMBER_CONTEXT = {
     "last_call_date": "never",
     "direction": "inbound",
     "platform_brand": "Arrivia",
-    "platform_brand_phonetic": "uh-RIH-vee-uh",
+    "platform_brand_phonetic": "uh-RIV-ee-uh",
     "program_brand": "Government Vacation Rewards",
     "specialist_phone": "+10000000000",
     "booking_link_label": "your scheduling link",
@@ -381,7 +381,7 @@ DEFAULT_MEMBER_CONTEXT = {
 GREETING_INSTRUCTIONS_INBOUND_TEMPLATE = (
     "The caller dialed in (INBOUND). Open with the canonical GVR "
     "inbound disclosure VERBATIM. Pronounce the name as Andee (NOT "
-    "letter-by-letter). Pronounce Arrivia as \"uh-RIH-vee-uh\". "
+    "letter-by-letter). Pronounce Arrivia as \"uh-RIV-ee-uh\". "
     "Say EXACTLY: \"Hi, this is Andee, your virtual benefits guide "
     "with Government Vacation Rewards. This call may be recorded. "
     "I can walk you through how your travel benefits work — Savings "
@@ -398,7 +398,7 @@ GREETING_INSTRUCTIONS_INBOUND_TEMPLATE = (
 GREETING_INSTRUCTIONS_OUTBOUND_TEMPLATE = (
     "You are calling the member (OUTBOUND). Open with the canonical "
     "GVR outbound disclosure VERBATIM. Pronounce Andee not letters. "
-    "Pronounce Arrivia as \"uh-RIH-vee-uh\". "
+    "Pronounce Arrivia as \"uh-RIV-ee-uh\". "
     "Say EXACTLY: \"Hi {member_name}, this is Andee, your virtual "
     "benefits guide calling from Government Vacation Rewards. This "
     "call may be recorded. I'm reaching out because you have "
@@ -433,7 +433,20 @@ You handle two kinds of calls:
 The dispatch metadata's `direction` field tells you which flow
 applies for this call (inbound vs outbound).
 
-Pronounce "Arrivia" as **uh-RIH-vee-uh**. Pronounce your own name
+Pronounce "Arrivia" as **uh-RIV-ee-uh** — FOUR syllables (uh / RIV /
+ee / uh, stress on RIV). The TTS frequently mangles the literal
+letters "Arrivia" into a 3-syllable "uh-REE-vah". To prevent that,
+**WRITE THE BRAND NAME PHONETICALLY IN YOUR SPOKEN OUTPUT.** When
+you would say "Arrivia" out loud, write it as **uh-RIV-ee-uh**
+(with the dashes) in your response text. Rime reads the dashes
+correctly and lands the four-syllable pronunciation.
+
+Examples of correct spoken output:
+  "Government Vacation Rewards is operated by uh-RIV-ee-uh."
+  "uh-RIV-ee-uh is a private travel-rewards company."
+
+Do NOT write "Arrivia" in spoken text — it triggers the
+mispronounce. Pronounce your own name
 as **Andee** (two syllables, NOT spelled letter-by-letter). If you
 feel about to mispronounce either, slow down.
 

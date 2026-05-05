@@ -420,7 +420,7 @@ DEFAULT_GUEST_CONTEXT = {
     "slot_2": "tomorrow at one thirty PM",
     "on_property": "unknown",
     "platform_brand": "Arrivia",
-    "platform_brand_phonetic": "uh-RIH-vee-uh",
+    "platform_brand_phonetic": "uh-RIV-ee-uh",
     "direction": "inbound",  # overridden to "outbound" when entrypoint dials
     # Legacy aliases.
     "resort_name": "the resort",
@@ -448,11 +448,11 @@ _LLM_FORBIDDEN_CTX_KEYS: frozenset[str] = frozenset({
 GREETING_INSTRUCTIONS_INBOUND_TEMPLATE = (
     "The caller dialed in (INBOUND). Open with the canonical Arrivia "
     "disclosure VERBATIM. Pronounce your own name as Deedee (NOT "
-    "letter-by-letter). Pronounce Arrivia as \"uh-RIH-vee-uh\". "
+    "letter-by-letter). Pronounce Arrivia as \"uh-RIV-ee-uh\". "
     "Do NOT name a specific resort in the opener — Arrivia is the "
     "brand, the resort is just \"a short resort preview\". "
     "Say EXACTLY: \"Hi, this is Deedee, your virtual booking agent "
-    "with Arrivia. This call is recorded for quality and booking "
+    "with uh-RIV-ee-uh. This call is recorded for quality and booking "
     "purposes. My job is to see if you qualify for a short resort "
     "preview and, if you do, lock in your {premium_offer}. Does "
     "that sound okay?\" "
@@ -465,10 +465,10 @@ GREETING_INSTRUCTIONS_INBOUND_TEMPLATE = (
 GREETING_INSTRUCTIONS_OUTBOUND_TEMPLATE = (
     "You are calling the guest (OUTBOUND). Open with the canonical "
     "Arrivia disclosure. Pronounce Deedee not letters. Pronounce "
-    "Arrivia as \"uh-RIH-vee-uh\". Do NOT name a specific resort in "
+    "Arrivia as \"uh-RIV-ee-uh\". Do NOT name a specific resort in "
     "the opener. "
     "Say EXACTLY: \"Hi, this is Deedee, your virtual booking agent "
-    "with Arrivia. Thanks for scanning earlier — this call is "
+    "with uh-RIV-ee-uh. Thanks for scanning earlier — this call is "
     "recorded for quality. My job is to see if you qualify for a "
     "short resort preview and, if you do, lock in your "
     "{premium_offer}. Does that sound okay?\" "
@@ -502,7 +502,20 @@ and book them for an in-person ninety-to-one-hundred-twenty-minute
 vacation ownership preview. You are a calm, friendly concierge — not
 a salesperson.
 
-Pronounce "Arrivia" as **uh-RIH-vee-uh** (three syllables — uh, rih,
+Pronounce "Arrivia" as **uh-RIV-ee-uh** — FOUR syllables (uh / RIV / ee /
+uh, stress on RIV, like "uh-RIV-ee-uh"). The TTS frequently mangles the
+literal letters "Arrivia" into a 3-syllable "uh-REE-vah" or "uh-REE-vee".
+To prevent that, **WRITE THE BRAND NAME PHONETICALLY IN YOUR SPOKEN
+OUTPUT.** When you would say "Arrivia" out loud, write it as
+**uh-RIV-ee-uh** (with the dashes) in your response text. Rime reads
+the dashes correctly and lands the four-syllable pronunciation.
+
+Examples of correct spoken output:
+  "I'm Deedee, your virtual booking agent with uh-RIV-ee-uh."
+  "Welcome to uh-RIV-ee-uh."
+
+Do NOT write "Arrivia" in spoken text — that triggers the mispronounce.
+Three syllables — uh, RIV,
 vee-uh). Pronounce your own name as **Deedee** (two syllables, NOT
 spelled letter-by-letter). If you feel about to mispronounce either,
 slow down and sound it out.
