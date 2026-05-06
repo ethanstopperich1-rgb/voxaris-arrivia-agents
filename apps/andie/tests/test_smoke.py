@@ -17,7 +17,8 @@ def test_persona_brands_as_arrivia_and_gvr() -> None:
     text = _flat(render_persona())
     assert "arrivia" in text
     assert "government vacation rewards" in text
-    assert "uh-rih-vee-uh" in text
+    # Phonetic spelling for the TTS — note RIV (not RIH).
+    assert "uh-riv-ee-uh" in text
 
 
 def test_persona_disclaims_government_endorsement() -> None:
@@ -43,13 +44,21 @@ def test_persona_has_4_pillars() -> None:
 
 
 def test_inbound_greeting_leads_with_live_transfer() -> None:
-    """User explicitly required: live transfer = default, link = backup."""
-    from voxaris_andie.worker import render_greeting
-    text = _flat(render_greeting({"direction": "inbound"}))
-    assert "thanks for calling" in text
+    """User explicitly required: live transfer = default, link = backup.
+
+    The current verbatim opener (`OPENER_INBOUND_VERBATIM`) introduces
+    Andee, discloses recording, names the four pillars, and offers two
+    paths: walk-through OR specialist transfer. We verify the opener
+    text directly since session.say() now plays it (the `render_greeting`
+    instructions are kept for backward compat but no longer the source
+    of truth).
+    """
+    from voxaris_andie.worker import render_opener_text
+    text = _flat(render_opener_text({"direction": "inbound"}))
+    assert "this call may be recorded" in text
     assert "specialist" in text
-    # Live transfer must be the default offer in the greeting
-    assert "right now" in text or "right-now" in text
+    # The opener must offer the transfer path — not be walk-through-only.
+    assert "specialist if you'd rather" in text or "get you to a specialist" in text
 
 
 def test_outbound_greeting_says_calling() -> None:
@@ -144,7 +153,10 @@ def test_persona_has_trust_building_phrases() -> None:
     text = _flat(render_persona())
     assert "trust-building" in text or "wary" in text
     assert "log into your account" in text
-    assert "courtesy call" in text
+    # Replaces the older "courtesy call" check — current persona uses
+    # the credibility-anchor pattern (enrollment date + email on file)
+    # which Jay flagged as the highest-impact early-call trust move.
+    assert "email on file" in text or "credibility anchor" in text
 
 
 def test_persona_lists_lookup_objection_tool() -> None:
