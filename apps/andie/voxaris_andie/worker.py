@@ -1499,9 +1499,20 @@ async def entrypoint(ctx: JobContext) -> None:
         extra_kwargs={"temperature": 0.0, "max_completion_tokens": 180},
     )
 
+    # Primary TTS is Cartesia Sonic-3 with our cloned Andy voice
+    # (switched from Rime mistv3 on 2026-05-05). Cheaper than Rime
+    # (~$0.008/min vs $0.012/min), lower TTFB on PSTN, and the cloned
+    # voice ID below was generated from the same reference audio used
+    # for the Rime steppe variant — so the persona stays consistent.
     primary_tts = inference.TTS(
-        # Steppe voice on Rime mistv3 — distinct from Deedy's mistv3
-        # cove so members can tell the two agents apart.
+        model="cartesia/sonic-3",
+        voice="e07c00bc-4134-4eae-9ea4-1a55fb45746b",
+        language="en",
+    )
+    # Rime mistv3 (steppe) demoted to first fallback — kept warm in
+    # case Cartesia has a regional outage. Same voice config as the
+    # previous primary so behavior under failover is unchanged.
+    fallback_tts_rime_mistv3 = inference.TTS(
         model="rime/mistv3",
         voice="steppe",
         language="eng",
@@ -1514,9 +1525,6 @@ async def entrypoint(ctx: JobContext) -> None:
     )
     fallback_tts_arcana = inference.TTS(
         model="rime/arcana", voice="luna", language="en",
-    )
-    fallback_tts_cartesia = inference.TTS(
-        model="cartesia/sonic-2", voice="warm-female", language="en",
     )
 
     session = AgentSession(
@@ -1533,7 +1541,7 @@ async def entrypoint(ctx: JobContext) -> None:
             retry_interval=0.5,
         ),
         tts=TTSFallback(
-            [primary_tts, fallback_tts_arcana, fallback_tts_cartesia],
+            [primary_tts, fallback_tts_rime_mistv3, fallback_tts_arcana],
             max_retry_per_tts=1,
         ),
         vad=silero.VAD.load(),
