@@ -519,6 +519,11 @@ scripted. To stay convincing:
 - When confused, say: "Sorry, <break time=\"300ms\"/> I think I
   missed that — what did you say?"
 - When closing a topic, summarize in one short line.
+- After a genuinely funny line from the caller (a self-deprecating
+  joke, an unexpected zinger), you MAY drop a soft [laughter] tag —
+  for example: "Oh [laughter] that's amazing." Use this AT MOST
+  ONCE per call. It only renders if Cartesia TTS is active; never
+  pile on. Not for polite acknowledgments, only for genuine reactions.
 
 # Pauses and filler words
 
@@ -1382,15 +1387,30 @@ async def entrypoint(ctx: JobContext) -> None:
         },
     )
 
-    # Primary TTS is Cartesia Sonic-3 with our cloned Andy voice
+    # Primary TTS is Cartesia Sonic-3 with a Cartesia library voice
     # (switched from Rime mistv3 on 2026-05-05). Cheaper than Rime
-    # (~$0.008/min vs $0.012/min), lower TTFB on PSTN, and the cloned
-    # voice ID below was generated from the same reference audio used
-    # for the Rime steppe variant — so the persona stays consistent.
+    # (~$0.008/min vs $0.012/min), lower TTFB on PSTN.
+    #
+    # extra_kwargs tuning (per Cartesia Sonic-3 docs:
+    #   docs.cartesia.ai/build-with-cartesia/sonic-3/volume-speed-emotion):
+    #   emotion="content"  → warm but calm baseline. Avoids the flat
+    #                        default reading and the over-energetic
+    #                        "excited" preset. Per LiveKit's realistic
+    #                        voice guide: emotion is a baseline, not
+    #                        a switching dial.
+    #   speed=0.95         → slightly slower than 1.0 default. PSTN
+    #                        compresses higher frequencies, so a hair
+    #                        slower reads as more natural / human.
+    #                        Range is 0.6-1.5; 0.95 is the sweet spot
+    #                        for fronter warmth without sounding sluggish.
     primary_tts = inference.TTS(
         model="cartesia/sonic-3",
         voice="e07c00bc-4134-4eae-9ea4-1a55fb45746b",
         language="en",
+        extra_kwargs={
+            "emotion": "content",
+            "speed": 0.95,
+        },
     )
     # Rime mistv3 (steppe) demoted to first fallback — kept warm in
     # case Cartesia has a regional outage. Same voice config as the
@@ -1433,6 +1453,11 @@ async def entrypoint(ctx: JobContext) -> None:
         allow_interruptions=True,
         min_interruption_words=2,
         min_interruption_duration=0.4,
+        # Aligned transcripts — Cartesia ships word-level timing with
+        # the audio frames, which makes the dashboard's live transcript
+        # follow the speaker in real time instead of jumping ahead.
+        # Free perf win for ops visibility, no latency cost.
+        use_tts_aligned_transcript=True,
     )
 
     # Per-call usage telemetry — logs + dashboard POST.
