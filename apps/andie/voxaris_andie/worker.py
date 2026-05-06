@@ -1409,7 +1409,7 @@ async def entrypoint(ctx: JobContext) -> None:
         language="en",
         extra_kwargs={
             "emotion": "content",
-            "speed": 0.95,
+            "speed": 1.1,
         },
     )
     # Rime mistv3 (steppe) demoted to first fallback — kept warm in
