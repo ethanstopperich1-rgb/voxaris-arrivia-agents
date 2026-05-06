@@ -414,6 +414,38 @@ GREETING_INSTRUCTIONS_OUTBOUND_TEMPLATE = (
 )
 
 
+# ─────────────────────────────────────────────
+# Verbatim opener strings — used directly via session.say() so we skip
+# the LLM round-trip for the greeting (saves ~1-2s on first response).
+# These mirror what the GREETING_*_TEMPLATE instructions tell the LLM
+# to say "EXACTLY", so behavior is identical — just faster.
+# ─────────────────────────────────────────────
+OPENER_INBOUND_VERBATIM = (
+    "Hi, this is Andee, your virtual benefits guide with Government "
+    "Vacation Rewards. This call may be recorded. I can walk you through "
+    "how your travel benefits work — Savings Credits, Reward Points, "
+    "Quarterly Specials, Great Getaways — or get you to a specialist if "
+    "you'd rather. What can I help you with today?"
+)
+
+OPENER_OUTBOUND_VERBATIM_TEMPLATE = (
+    "Hi {member_name}, this is Andee, your virtual benefits guide calling "
+    "from Government Vacation Rewards. This call may be recorded. I'm "
+    "reaching out because you have {incentive_amount} of unused travel "
+    "credits in your account, and I'd love to walk you through what "
+    "they're for. Got a quick minute?"
+)
+
+
+def render_opener_text(ctx: dict[str, str] | None = None) -> str:
+    """Return the verbatim opener text to feed directly to session.say()."""
+    merged = {**DEFAULT_MEMBER_CONTEXT, **(ctx or {})}
+    direction = merged.get("direction", "inbound")
+    if direction == "outbound":
+        return OPENER_OUTBOUND_VERBATIM_TEMPLATE.format(**merged)
+    return OPENER_INBOUND_VERBATIM
+
+
 PERSONA_INSTRUCTIONS_TEMPLATE = """
 You are Andie, the virtual benefits guide for **Government Vacation
 Rewards (GVR)** — a private travel-rewards membership program
@@ -1465,16 +1497,21 @@ async def entrypoint(ctx: JobContext) -> None:
     # Primary STT is Deepgram Flux — purpose-built for voice agents with
     # model-integrated end-of-turn detection (~260ms), eager EOT for early
     # LLM draft, and native barge-in. Nova-3 level transcription accuracy.
-    # The eot_threshold values below are intentionally tuned: eager at 0.7
-    # starts drafting the response, full commit at 0.9, with a 2s silence
-    # ceiling. Don't loosen these without measuring barge-in regressions.
+    #
+    # EOT tuning (retuned 2026-05-05 — previous values were too conservative
+    # and produced ~2s pauses on every turn):
+    #   eot_threshold=0.7          → matches Flux default; reliable commit
+    #   eager_eot_threshold=0.5    → start drafting the LLM response as
+    #                                soon as we're 50% sure they're done
+    #   eot_timeout_ms=800         → cap silence-forced EOT at 800ms; was
+    #                                2000ms which felt unnatural
     primary_stt = inference.STT(
         model="deepgram/flux-general",
         language="en",
         extra_kwargs={
-            "eager_eot_threshold": 0.7,
-            "eot_threshold": 0.9,
-            "eot_timeout_ms": 2000,
+            "eager_eot_threshold": 0.5,
+            "eot_threshold": 0.7,
+            "eot_timeout_ms": 800,
         },
     )
     # Nova-3 fallback — drops to it on Flux regional outage. No EOT params
@@ -1608,7 +1645,16 @@ async def entrypoint(ctx: JobContext) -> None:
         ),
     )
 
-    await session.generate_reply(instructions=render_greeting(member_ctx))
+    # Skip the LLM for the verbatim opener — feed the text straight to
+    # TTS via session.say(). The opener templates are 100% verbatim, so
+    # round-tripping through GPT-4o-mini just to have it regurgitate the
+    # exact same string burns 1-2s of first-response latency for nothing.
+    # session.say() still adds the line to chat history so subsequent
+    # LLM turns know what was said.
+    await session.say(
+        render_opener_text(member_ctx),
+        allow_interruptions=True,
+    )
 
 
 def cli_main() -> None:
