@@ -1462,7 +1462,14 @@ async def entrypoint(ctx: JobContext) -> None:
     from livekit.agents.stt import FallbackAdapter as STTFallback
     from livekit.agents.tts import FallbackAdapter as TTSFallback
 
-    primary_stt = inference.STT(
+    # Primary STT is Deepgram Nova-3 (switched from flux-general 2026-05-05).
+    # Turn-taking is handled by the session-level VAD + STT turn detection
+    # (see TurnHandlingOptions(turn_detection="stt") below) so Flux's native
+    # EOT features aren't needed.
+    primary_stt = inference.STT(model="deepgram/nova-3", language="en")
+    # Flux demoted to fallback — kept warm in case Nova-3 has a regional
+    # outage. EOT params retained because Flux uses them natively.
+    fallback_stt = inference.STT(
         model="deepgram/flux-general",
         language="en",
         extra_kwargs={
@@ -1471,7 +1478,6 @@ async def entrypoint(ctx: JobContext) -> None:
             "eot_timeout_ms": 2000,
         },
     )
-    fallback_stt = inference.STT(model="deepgram/nova-3", language="en")
 
     # max_completion_tokens dropped 400 → 180. At ~3 tokens/word that's
     # roughly 60 words / 4 short sentences max — enough for any single
