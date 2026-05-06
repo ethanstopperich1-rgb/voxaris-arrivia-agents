@@ -1487,25 +1487,31 @@ async def entrypoint(ctx: JobContext) -> None:
     # agent turn but tight enough to physically prevent run-on speech.
     # The persona's brevity rule does the heavy lifting; this is the
     # backstop when the model gets chatty under pressure.
+    #
+    # Primary swapped to OpenAI GPT-4o-mini on 2026-05-05. Cheaper than
+    # the Grok 4.20 we were on, comparable quality on a narrow fronter
+    # script, and OpenAI's edge POPs give us better US latency.
     primary_llm = inference.LLM(
+        model="openai/gpt-4o-mini",
+        extra_kwargs={"temperature": 0.0, "max_completion_tokens": 180},
+    )
+    # GPT-4.1-mini fallback — same provider, different model. Catches
+    # the case where 4o-mini specifically has issues (rate-limit on a
+    # popular model, model-specific bug) without needing to swap providers.
+    fallback_llm_openai = inference.LLM(
+        model="openai/gpt-4.1-mini",
+        extra_kwargs={"temperature": 0.0, "max_completion_tokens": 180},
+    )
+    # Cross-provider fallback — fires only if OpenAI as a whole is down.
+    # Grok 4.20 is the larger non-reasoning Grok model; the previous
+    # Grok 4-1-fast-non-reasoning fallback was removed (deprecating).
+    fallback_llm_grok = inference.LLM(
         model="xai/grok-4.20-0309-non-reasoning",
         extra_kwargs={
             "temperature": 0.0,
             "max_completion_tokens": 180,
             "parallel_tool_calls": False,
         },
-    )
-    fallback_llm_grok = inference.LLM(
-        model="xai/grok-4-1-fast-non-reasoning",
-        extra_kwargs={
-            "temperature": 0.0,
-            "max_completion_tokens": 180,
-            "parallel_tool_calls": False,
-        },
-    )
-    fallback_llm_openai = inference.LLM(
-        model="openai/gpt-4.1-mini",
-        extra_kwargs={"temperature": 0.0, "max_completion_tokens": 180},
     )
 
     # Primary TTS is Cartesia Sonic-3 with our cloned Andy voice
@@ -1544,7 +1550,7 @@ async def entrypoint(ctx: JobContext) -> None:
             retry_interval=0.5,
         ),
         llm=LLMFallback(
-            [primary_llm, fallback_llm_grok, fallback_llm_openai],
+            [primary_llm, fallback_llm_openai, fallback_llm_grok],
             attempt_timeout=5.0,
             max_retry_per_llm=0,
             retry_interval=0.5,
