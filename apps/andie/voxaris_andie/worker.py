@@ -46,12 +46,13 @@ from dotenv import load_dotenv
 from livekit import agents, api
 from livekit.agents import (
     Agent,
+    AgentServer,
     AgentSession,
     JobContext,
     JobProcess,
     RoomInputOptions,
     TurnHandlingOptions,
-    WorkerOptions,
+    WorkerOptions,  # kept for back-compat references; AgentServer is the new path
     cli,
     inference,
 )
@@ -1416,7 +1417,57 @@ class AndieAgent(Agent):
             return {"ok": False, "error": str(e)}
 
 
+# ─────────────────────────────────────────────
+# AgentServer + prewarm setup
+#
+# Migration from raw WorkerOptions to AgentServer + @server.rtc_session
+# decorator pattern, per livekit-examples/agent-starter-python (May 2026)
+# and the official AgentServer docs at /agents/server/options.
+#
+# Why the move:
+#   - Per-session log context via ctx.log_context_fields
+#   - Cleaner decorator-based registration
+#   - Same production settings supported (initialize_process_timeout,
+#     num_idle_processes) — verified in livekit/agents source code
+#     (livekit-agents/livekit/agents/worker.py + the bithuman avatar
+#     example which uses the exact same params we need)
+#
+# The 60s initialize_process_timeout + num_idle_processes=1 are required
+# for Render's cgroup-throttled hosts (12-20s ONNX/Silero load on a
+# fractional vCPU blows the default 10s timeout). Don't touch these.
+# ─────────────────────────────────────────────
+
+
+def prewarm(proc: JobProcess) -> None:
+    """Process-startup hook — load expensive models once per worker.
+
+    Called by LiveKit before the worker accepts any dispatches. The
+    cached values are reused across every call this process handles,
+    so we skip the ~200-500ms ONNX/Silero load on every cold call.
+
+    Pattern from livekit-examples/agent-starter-python and
+    livekit-examples/cartesia-voice-agent.
+    """
+    proc.userdata["vad"] = silero.VAD.load()
+
+
+server = AgentServer(
+    initialize_process_timeout=60,
+    num_idle_processes=1,
+    port=8082,
+)
+
+server.setup_fnc = prewarm
+
+
+@server.rtc_session(agent_name="andie-gvr")
 async def entrypoint(ctx: JobContext) -> None:
+    # Per-session log context — every log line emitted during this job
+    # automatically carries these fields. Pattern from agent-starter-python.
+    ctx.log_context_fields = {
+        "room": ctx.room.name,
+    }
+
     await ctx.connect()
 
     member_ctx = parse_metadata(ctx.job.metadata)
@@ -1625,6 +1676,11 @@ async def entrypoint(ctx: JobContext) -> None:
         # follow the speaker in real time instead of jumping ahead.
         # Free perf win for ops visibility, no latency cost.
         use_tts_aligned_transcript=True,
+        # Start LLM generation BEFORE the user finishes speaking — the
+        # response is mostly ready by the time their EOT fires. Standard
+        # in livekit-examples/agent-starter-python. Bigger perceived-
+        # latency win than VAD prewarm.
+        preemptive_generation=True,
     )
 
     # Per-call usage telemetry — logs + dashboard POST.
@@ -1715,44 +1771,25 @@ async def entrypoint(ctx: JobContext) -> None:
         )
 
 
-def prewarm(proc: JobProcess) -> None:
-    """Process-startup hook — load expensive models once per worker.
-
-    Called by LiveKit before the worker accepts any dispatches. The
-    cached values are reused across every call this process handles,
-    so we skip the ~200-500ms ONNX/Silero load on every cold call.
-
-    Pattern from livekit-examples/agent-starter-python and
-    livekit-examples/cartesia-voice-agent.
-    """
-    proc.userdata["vad"] = silero.VAD.load()
-
-
 def cli_main() -> None:
     """Console entrypoint exposed as `andie-worker`.
 
-    Explicit dispatch (`agent_name="andie-gvr"`). The dispatch rule
-    bound to LiveKit Phone Number +16892608790 must include
-    roomConfig.agents = [{ agentName: "andie-gvr" }] so this worker
-    receives those calls (and Deedy does NOT).
+    AgentServer-based registration (see the `server` definition above
+    the entrypoint). Agent name `andie-gvr` is set on the
+    @server.rtc_session decorator. The dispatch rule bound to LiveKit
+    Phone Number +16892608790 must include roomConfig.agents =
+    [{ agentName: "andie-gvr" }] so this worker receives those calls
+    (and Deedy does NOT).
     """
-    agents.cli.run_app(
-        WorkerOptions(
-            entrypoint_fnc=entrypoint,
-            prewarm_fnc=prewarm,
-            agent_name="andie-gvr",
-            port=8082,
-            # See Deedy's worker.py for the full rationale. tldr:
-            # cgroup-throttled hosts (Render, Fly, etc) spend 12-20s
-            # loading ONNX + Silero on a fractional vCPU, which
-            # blows the default 10s initialize_process_timeout.
-            # 60s + num_idle_processes=1 stops the silent crash loop.
-            initialize_process_timeout=60.0,
-            num_idle_processes=1,
-        )
-    )
+    # Use agents.cli (the imported `cli` symbol gets shadowed below by
+    # the entry-point alias).
+    agents.cli.run_app(server)
 
 
+# Entry-point alias for pyproject.toml's [project.scripts] mapping
+# (`andie-worker = voxaris_andie.worker:cli`). Shadows the `cli`
+# imported at the top of this file, but cli_main() uses agents.cli
+# directly so the shadow doesn't matter for the run path.
 cli = cli_main
 
 
