@@ -447,6 +447,48 @@ OPENER_OUTBOUND_VERBATIM_TEMPLATE = (
 )
 
 
+# ─────────────────────────────────────────────
+# Voicemail script — used when Twilio AMD detects a machine
+# (machine_end signal after the beep). Andie speaks this directly
+# via session.say() instead of the live opener.
+#
+# Same warm, personalized style as the live opener. ~25-second
+# runtime at natural pacing. If the recipient picks up mid-message
+# (Flux fires a transcript event from a new human voice), the
+# session's allow_interruptions=True cuts Andie off and the persona
+# instructs her to deliver the pivot line and drop into live mode.
+# ─────────────────────────────────────────────
+VOICEMAIL_VERBATIM_TEMPLATE = (
+    "Hi {member_name}, this is Andee calling on behalf of Government "
+    "Vacation Rewards. "
+    "<break time=\"250ms\"/>"
+    "I'm reaching out because you have {incentive_amount} in your "
+    "account that are ready to use, and I just want to make sure "
+    "you know how to access them. "
+    "<break time=\"250ms\"/>"
+    "We'd love to walk you through your benefits and help you put "
+    "them to work on your next trip. Just give us a call back at "
+    "{callback_number_spoken}. Again, that's {callback_number_spoken}. "
+    "<break time=\"250ms\"/>"
+    "If you'd prefer not to hear from us, call that same number and "
+    "we'll get you removed right away. "
+    "<break time=\"250ms\"/>"
+    "Talk soon, {member_name}."
+)
+
+
+def render_voicemail_text(ctx: dict[str, str] | None = None) -> str:
+    """Return the verbatim voicemail message to feed directly to session.say().
+
+    Mirrors render_opener_text() — same template-with-dynamic-vars
+    pattern, no LLM round-trip. The persona handles the mid-message
+    pivot via interruption rules; this function only renders the
+    canonical message Andie speaks while leaving voicemail.
+    """
+    merged = {**DEFAULT_MEMBER_CONTEXT, **(ctx or {})}
+    return VOICEMAIL_VERBATIM_TEMPLATE.format(**merged)
+
+
 def render_opener_text(ctx: dict[str, str] | None = None) -> str:
     """Return the verbatim opener text to feed directly to session.say()."""
     merged = {**DEFAULT_MEMBER_CONTEXT, **(ctx or {})}
