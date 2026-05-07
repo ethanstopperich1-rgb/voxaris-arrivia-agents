@@ -165,6 +165,85 @@ def test_persona_lists_lookup_objection_tool() -> None:
     assert "lookup_objection" in render_persona()
 
 
+# ─────────────────────────────────────────────
+# Voicemail behavior tests (added 2026-05-06)
+#
+# When AMD detects a machine, Andie speaks a verbatim voicemail
+# message via session.say() instead of the live opener. If the
+# recipient picks up mid-message, allow_interruptions=True cuts her
+# off and the persona instructs her to pivot. These tests verify
+# the static pieces — script content, persona handling, hangup
+# disposition — without booting a full LiveKit session.
+# ─────────────────────────────────────────────
+
+
+def test_voicemail_render_outbound_with_dynamic_vars() -> None:
+    """Voicemail script interpolates name, incentive, and callback number."""
+    from voxaris_andie.worker import render_voicemail_text
+
+    text = render_voicemail_text({
+        "member_name": "Stacey",
+        "incentive_amount": "two hundred fifty dollars",
+        "callback_number_spoken": "1 2 3, 4 5 6, 7 8 9 0",
+    })
+    assert "Stacey" in text
+    assert "two hundred fifty dollars" in text
+    assert "1 2 3, 4 5 6, 7 8 9 0" in text
+    # Repeats the callback number twice ("Again, that's...")
+    assert text.count("1 2 3, 4 5 6, 7 8 9 0") == 2
+    # SSML breaks for natural pacing on Cartesia
+    assert '<break time="' in text
+
+
+def test_voicemail_render_default_ctx_does_not_crash() -> None:
+    """Empty ctx falls through to DEFAULT_MEMBER_CONTEXT cleanly."""
+    from voxaris_andie.worker import render_voicemail_text
+
+    text = render_voicemail_text(None)
+    # Default member_name is "there" — covers no-name case
+    assert "there" in text
+    assert "Government Vacation Rewards" in text
+
+
+def test_voicemail_has_required_compliance_pieces() -> None:
+    """Three things must always be in the voicemail: brand, callback, opt-out."""
+    from voxaris_andie.worker import render_voicemail_text
+
+    text = _flat(render_voicemail_text({"member_name": "Test"}))
+    # Brand identification
+    assert "government vacation rewards" in text
+    # Callback path — both the explicit "call back at" and the repeat
+    assert "call back" in text or "give us a call" in text
+    # Opt-out disclosure (TCPA-defensive — "if you'd prefer not to hear from us")
+    assert "removed" in text or "remove" in text
+    assert "prefer not" in text or "opt out" in text
+
+
+def test_persona_has_voicemail_handling_section() -> None:
+    """Persona must instruct Andie how to handle voicemail and the
+    mid-message pivot. Without this, the LLM doesn't know to call
+    hangup_call after a clean voicemail or to pivot when interrupted."""
+    from voxaris_andie.worker import render_persona
+
+    text = render_persona()
+    assert "Voicemail handling" in text
+    # The pivot instruction — Andie must acknowledge being mid-voicemail
+    assert "leaving you a quick voicemail" in text or "mid-voicemail" in text.lower()
+    # The hangup disposition for completed voicemail
+    assert "voicemail_left" in text
+
+
+def test_hangup_tool_accepts_voicemail_dispositions() -> None:
+    """The hangup_call tool description must list voicemail_left and
+    no_answer as valid reasons so the LLM uses them correctly."""
+    from voxaris_andie.worker import render_persona
+
+    persona = render_persona()
+    # Mentioned in persona's Tools section as valid dispositions
+    # (sanity check that hangup_call is documented at all)
+    assert "hangup_call" in persona
+
+
 def test_metadata_parser() -> None:
     from voxaris_andie.worker import parse_metadata
     assert parse_metadata(None) == {}

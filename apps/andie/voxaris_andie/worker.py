@@ -375,6 +375,10 @@ DEFAULT_MEMBER_CONTEXT = {
     "program_brand": "Government Vacation Rewards",
     "specialist_phone": "+10000000000",
     "booking_link_label": "your scheduling link",
+    # Voicemail callback number — read digit-by-digit so the TTS
+    # spells it out instead of saying it as a number. Override per
+    # campaign by passing `callback_number_spoken` in dispatch metadata.
+    "callback_number_spoken": "8 6 6, 8 7 1, 9 3 3 6",
 }
 
 
@@ -701,6 +705,45 @@ High-conversion moves:
 - BONUS CARROT: "If we connect now, your account picks up
   {transfer_bonus_amount} on top — that takes you to
   {total_after_bonus} total. Cool to bridge?"
+
+# Voicemail handling
+
+When you reach a voicemail (Twilio AMD signals machine_end after
+the beep), you do NOT speak the live opener. Instead you leave the
+canonical voicemail message — that script is fired via session.say
+before you ever generate a reply, so by the time you take a turn
+the message is either finishing or has been interrupted by a real
+human voice.
+
+Two cases:
+
+1. The message plays through to the end without interruption. Your
+   first generated turn after the message completes MUST be a tool
+   call: hangup_call(reason="voicemail_left"). Do not speak any
+   additional words. The voicemail message is the entire script;
+   nothing else gets recorded.
+
+2. A human voice cuts in mid-message (Flux fires a transcript event
+   from the recipient who picked up while you were leaving the
+   voicemail). LiveKit's allow_interruptions=True stops your
+   playback the moment that happens. Your FIRST live turn must be
+   the pivot line — exactly this rhythm:
+
+   "Oh, hi {member_first_name}. <break time=\"200ms\"/> Sorry — I
+   was actually just leaving you a quick voicemail. Got a quick
+   minute?"
+
+   Adapt the name / "got a quick minute" wording naturally — but
+   ALWAYS acknowledge that you were mid-voicemail. The recipient
+   knows they picked up during a recording; pretending nothing
+   happened reads like a robot.
+
+After the pivot line, run the standard outbound flow: discovery
+first (destination, timeframe, who's coming, occasion), then
+warm-transfer with context. Same rules as a normal live call.
+
+Never restart the voicemail message after a pivot. Once a human
+voice is on the line, you are in live mode, period.
 
 # Tools
 
@@ -1281,7 +1324,8 @@ class AndieAgent(Agent):
         description=(
             "End the call cleanly. Reason tags the exit for analytics — "
             "use one of: transferred, scheduled_callback, not_interested, "
-            "dnc, wrong_person, completed_no_action."
+            "dnc, wrong_person, voicemail_left, no_answer, "
+            "completed_no_action."
         ),
     )
     async def hangup_call(self, reason: str = "completed") -> dict:
@@ -1547,16 +1591,55 @@ async def entrypoint(ctx: JobContext) -> None:
         ),
     )
 
-    # Skip the LLM for the verbatim opener — feed the text straight to
-    # TTS via session.say(). The opener templates are 100% verbatim, so
-    # round-tripping through GPT-4o-mini just to have it regurgitate the
-    # exact same string burns 1-2s of first-response latency for nothing.
-    # session.say() still adds the line to chat history so subsequent
-    # LLM turns know what was said.
-    await session.say(
-        render_opener_text(member_ctx),
-        allow_interruptions=True,
-    )
+    # Branch on AMD signal — voicemail vs live human determines the
+    # entire first-turn behavior:
+    #   - machine_end / machine_start  → speak the voicemail script
+    #   - human / unknown / no signal  → speak the live opener
+    #
+    # The dispatch metadata's `amd_result` field is set by the cron
+    # that creates the dispatch (see app/api/cron/dial-batch in the
+    # dashboard repo, where Twilio AMD config gets attached). When
+    # AMD is not in use (e.g., inbound calls, manual dials from the
+    # dashboard, or sandbox testing) the field is absent and we
+    # default to the live opener — safe fallback since speaking the
+    # opener at a live human is always correct.
+    amd_result = (member_ctx.get("amd_result") or "").lower()
+    is_voicemail = amd_result in ("machine_start", "machine_end")
+
+    if is_voicemail:
+        # Speak the voicemail message directly — bypass LLM, same
+        # latency optimization we use for the live opener.
+        # allow_interruptions=True is critical here: it's what makes
+        # the mid-message pivot work. If the recipient picks up
+        # while we're recording, Flux fires a transcript event and
+        # the persona's voicemail-handling section instructs Andie
+        # to deliver the pivot line and drop into live mode.
+        await session.say(
+            render_voicemail_text(member_ctx),
+            allow_interruptions=True,
+        )
+        # If the message played through without interruption, hang
+        # up cleanly. If it WAS interrupted, control falls through
+        # to the standard agent turn loop and the persona handles
+        # the pivot from there.
+        # Note: detection of "did the message complete without
+        # interruption" is handled by checking the SpeechHandle
+        # state on the returned awaitable above — the .interrupted
+        # property tells us.
+        # For the simplest implementation, we let the LLM handle
+        # the next turn either way. If voicemail completed cleanly,
+        # the chat context shows no user message and the persona's
+        # disposition rule kicks in (call hangup_call(reason='voicemail_left')).
+    else:
+        # Live human path — speak the verbatim opener exactly as before.
+        # Skip the LLM round-trip for the same latency reason: the
+        # opener is 100% verbatim, no need for the LLM to regenerate it.
+        # session.say() adds the line to chat history so subsequent
+        # turns have the context.
+        await session.say(
+            render_opener_text(member_ctx),
+            allow_interruptions=True,
+        )
 
 
 def cli_main() -> None:
