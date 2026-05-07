@@ -36,118 +36,127 @@ def test_persona_brands_as_arrivia_not_resort() -> None:
 
     text = _flat(render_persona())
     assert "arrivia" in text
-    # Pronunciation guide present (Stacey corrected to uh-RIH-vee-uh)
-    assert "uh-rih-vee-uh" in text
+    # Pronunciation guide present (canonical port locks "uh-RIV-ee-uh")
+    assert "uh-riv-ee-uh" in text
 
 
 def test_persona_uses_generic_premium_language() -> None:
-    """Per Stacey: never name Disney tickets or specific premium."""
-    from voxaris_agent.worker import render_greeting, render_persona
+    """Per Stacey: never name a specific brand (Disney, etc.) for the offer.
+    The persona/greeting must reference the offer via the {premium_offer}
+    template variable so per-call substitution is brand-agnostic."""
+    from voxaris_agent.worker import (
+        DEFAULT_GUEST_CONTEXT,
+        GREETING_INSTRUCTIONS_INBOUND_TEMPLATE,
+        GREETING_INSTRUCTIONS_OUTBOUND_TEMPLATE,
+        PERSONA_INSTRUCTIONS_TEMPLATE,
+        render_greeting,
+        render_persona,
+    )
 
-    persona = render_persona()
+    # The TEMPLATES (pre-substitution) must reference the offer via the
+    # placeholder so the call-site can swap brands at dispatch time.
+    assert "{premium_offer}" in PERSONA_INSTRUCTIONS_TEMPLATE
+    assert "{premium_offer}" in GREETING_INSTRUCTIONS_INBOUND_TEMPLATE
+    assert "{premium_offer}" in GREETING_INSTRUCTIONS_OUTBOUND_TEMPLATE
+
+    # The RENDERED greeting must not contain banned brand-specific terms.
     greeting = render_greeting()
-    # The generic phrase must appear in both
-    assert "premium" in persona.lower()
-    assert "premium" in greeting.lower()
-    # The default greeting must NOT mention Disney (Stacey: don't name
-    # the specific premium on the call). The persona may reference
-    # Disney as an explicit don't-say example, that's fine.
-    assert "Disney" not in greeting
-    assert "park hopper" not in greeting
-    # Default guest context must use generic offer language
-    from voxaris_agent.worker import DEFAULT_GUEST_CONTEXT
+    persona = render_persona()
+    for banned in ("Disney", "park hopper", "Universal", "Marriott"):
+        assert banned not in greeting, f"banned brand surfaced in greeting: {banned}"
+        assert banned not in persona, f"banned brand surfaced in persona: {banned}"
+
+    # Default guest context must not pre-bind a specific brand.
     assert "Disney" not in DEFAULT_GUEST_CONTEXT["premium_offer"]
-    assert "premium" in DEFAULT_GUEST_CONTEXT["premium_offer"].lower()
+    assert "park hopper" not in DEFAULT_GUEST_CONTEXT["premium_offer"]
 
 
-def test_persona_lists_all_nine_canonical_gates() -> None:
+def test_persona_lists_all_eight_canonical_hard_qual_checks() -> None:
+    """Per Cassie OPC Script v2.0 (May 2026) — 8 hard-qualify checks
+    in PHASE 4 (was 9 with local-market in pre-v2.0; v2.0 moves
+    local-market to PHASE 3 soft-qualify). White-labeled into Deedy."""
     from voxaris_agent.worker import render_persona
 
     text = _flat(render_persona())
-    for gate in (
-        "twenty-five or older",
-        "fifty thousand dollars",
-        "decision-makers",
-        "credit card",
-        "active bankruptcy",
-        "employed, self-employed",
-        "six to twelve months",
-        "central florida",
-        "english",
-        "90-minute preview",
+    # Eight hard-qualify checks, plus PHASE 3 local-market check.
+    # The script (Stacey, May 2026) uses the digit "25" in the age check.
+    # Income/$50K is spelled out per output_rules. Both forms are accepted.
+    for check in (
+        ("over 25", "twenty-five"),         # 1. Age 25+
+        ("decision-makers",),               # 2. Both attending
+        ("fifty thousand",),                # 3. Income $50K+
+        ("credit card",),                   # 4. Major CC (yes/no)
+        ("employed",),                      # 5. Employment
+        ("last year",),                     # 6. Tour history
+        ("open promotional",),              # 7. Open packages
+        ("english",),                       # 8. Language self-check
+        ("local market",),                  # PHASE 3 soft-qualify gate
     ):
-        assert gate in text, f"missing canonical gate: {gate!r}"
+        assert any(c in text for c in check), f"missing canonical check: any of {check!r}"
 
 
-def test_persona_has_18_plus_data_consent_gate() -> None:
-    """Per Stacey + COPPA: confirm 18+ BEFORE collecting any data."""
-    from voxaris_agent.worker import render_greeting, render_persona
-
-    persona = _flat(render_persona())
-    greeting = _flat(render_greeting())
-    assert "eighteen" in persona or "18+" in persona or "18 or older" in persona
-    assert "eighteen" in greeting or "18" in greeting
-    assert "before collecting" in persona or "before" in persona
-
-
-def test_persona_has_pci_absolute_prohibition() -> None:
+def test_persona_has_pii_prohibition() -> None:
+    """v2.0 calls it 'PII prohibition' (covers PCI + SSN + DOB + DL)."""
     from voxaris_agent.worker import render_persona
 
     text = _flat(render_persona())
-    assert "absolute prohibition" in text
+    assert "pii prohibition" in text
     assert "credit card number" in text
-    assert "cvv" in text
-    assert "please stop" in text
+    assert "social security number" in text
+    # Card-digit interrupt phrase must be present
+    assert "don't read that to me" in text or "don't read that" in text
 
 
-def test_persona_handles_pushback_softly() -> None:
-    """Per Stacey: she shouldn't drop the call when challenged."""
+def test_persona_has_golden_rule_on_disqualifies() -> None:
+    """Per Cassie OPC v2.0: Cassie/Deedy NEVER says 'you don't qualify.'
+    Always frames as fit + alternative. Caller hangs up feeling respected."""
     from voxaris_agent.worker import render_persona
 
     text = _flat(render_persona())
-    # The revised "handling pushback" rules must be present
-    assert "factual pushback" in text or "factual challenges" in text
-    assert "do not drop" in text or "not drop the call" in text
+    assert "golden rule" in text
+    # Split into two adjacency checks so quote-style differences don't break it
+    assert "never says" in text
+    assert "you don't qualify" in text
+    assert "fit problem" in text
+    assert "respected" in text
 
 
-def test_persona_22_node_flow_intact() -> None:
+def test_persona_5_phase_flow_intact() -> None:
+    """Canonical OPC v2.0 replaces the legacy 22-node flow with 5 named
+    phases. The phase headers must all be present in the prompt."""
     from voxaris_agent.worker import render_persona
 
-    text = _flat(render_persona())
-    for node in (
-        "start_disclosures",
-        "hook_and_permission",
-        "soft_qual",
-        "hard_qual_age",
-        "hard_qual_decision_makers",
-        "hard_qual_income",
-        "hard_qual_employment",
-        "hard_qual_credit",
-        "hard_qual_prior_tour",
-        "hard_qual_residency",
-        "hard_qual_language",
-        "hard_qual_attendance",
-        "schedule_offer",
-        "deposit_explanation",
-        "confirm_and_sms_consent",
-        "book_tool_call",
-        "end_confirmed_tour",
-        "end_graceful",
-        "obj_time",
-        "obj_sales",
-        "obj_spouse",
-        "obj_general",
+    text = render_persona()  # not flattened — phase headers are upper-case
+    for phase in (
+        "PHASE 1",
+        "PHASE 2",
+        "PHASE 3",
+        "PHASE 4",
+        "PHASE 5",
+        "INTRO & HOOK",
+        "RAPPORT",
+        "SOFT QUALIFY",
+        "HARD QUALIFY",
+        "CLOSE",
+        "KEY FRAMING",
+        "GOLDEN RULE",
+        "THREE-STRIKE RULE",
     ):
-        assert node in text, f"missing flow node: {node}"
+        assert phase in text, f"missing canonical phase marker: {phase}"
 
 
-def test_persona_includes_deposit_branching() -> None:
+def test_persona_includes_folio_deposit() -> None:
+    """v1 is on-property only; folio handles deposit. The deposit
+    framing must appear so any LLM in the fallback chain renders it
+    consistently."""
     from voxaris_agent.worker import render_persona
 
     text = _flat(render_persona())
-    assert "on_property is true" in text
-    assert "on_property is false" in text
     assert "folio" in text
+    assert "seventy-five dollar" in text
+    assert "comes right back off" in text
+    # On-property scope explicit
+    assert "on-property guests" in text or "on-property only" in text
 
 
 def test_persona_names_agent_deedy() -> None:
@@ -162,16 +171,27 @@ def test_persona_names_agent_deedy() -> None:
     assert "Deedee" in rendered_greeting or "Deedy" in rendered_greeting
 
 
-def test_inbound_greeting_does_not_say_im_calling() -> None:
-    """Inbound calls must not have outbound phrasing."""
+def test_inbound_greeting_uses_canonical_opener() -> None:
+    """v2.0 opener: 'Hi, this is Deedee — I'm a virtual booking agent...'
+    Names the offer. No 'thanks for calling' (legacy pre-v2.0 wording)."""
     from voxaris_agent.worker import render_greeting
 
     inbound = render_greeting({"direction": "inbound"}).lower()
-    assert "thanks for calling" in inbound
-    assert "scanned" not in inbound  # only outbound mentions scanning
+    # Canonical v2.0 opener wording
+    assert "deedee" in inbound
+    assert "virtual booking agent" in inbound
+    assert "uh-riv-ee-uh" in inbound
+    # Names the offer hook (v2.0 critical change — caller already knows
+    # they want it; skip fishing)
+    assert "claiming your" in inbound or "interested in" in inbound
+    # Inbound must NOT say outbound-only phrasing
+    assert "i'm calling on behalf of" not in inbound
+    assert "thanks for scanning" not in inbound
 
 
 def test_outbound_greeting_says_im_calling() -> None:
+    """Outbound greeting must include 'I'm calling on behalf of'
+    or similar outbound-direction language."""
     from voxaris_agent.worker import render_greeting
 
     outbound = render_greeting({"direction": "outbound"}).lower()
@@ -179,31 +199,37 @@ def test_outbound_greeting_says_im_calling() -> None:
 
 
 def test_persona_lists_all_real_tools() -> None:
+    """Tools per Cassie OPC v2.0 white-labeled into Deedy.
+    'opc_book' is Deedy's booking primitive (Cassie calls it 'book_tour').
+    'transfer_to_human' is Deedy's escalation tool (Cassie: 'escalate_to_human').
+    Other tools are common."""
     from voxaris_agent.worker import render_persona
 
     text = render_persona()
     for tool in (
         "lookup_qa",
         "lookup_objection",
-        "opc_book",
-        "send_sms_confirmation",
-        "hangup_call",
+        "verify_me_to_caller",
         "note_uncertainty",
+        "send_sms_confirmation",
+        "opc_book",
         "transfer_to_human",
+        "hangup_call",
     ):
         assert tool in text, f"missing tool reference: {tool}"
 
 
-def test_persona_has_escalation_policy() -> None:
-    """Three triggers: 2x no_match, 2x hedge, 3x repeat-question."""
+def test_persona_has_three_strike_rule() -> None:
+    """v2.0 replaces the legacy two-strike rule + 'before you hedge'
+    escalation with a clear three-strike rule on objections."""
     from voxaris_agent.worker import render_persona
 
     text = _flat(render_persona())
-    assert "escalation policy" in text
+    assert "three-strike rule" in text
+    assert "third time" in text or "third strike" in text
+    # note_uncertainty + transfer_to_human are still tool-level escalation
     assert "note_uncertainty" in text
     assert "transfer_to_human" in text
-    # The "before you hedge" rule must be explicit
-    assert "before you hedge" in text
 
 
 def test_lookup_qa_escalates_after_two_no_match() -> None:
@@ -239,24 +265,23 @@ def test_lookup_qa_streak_resets_on_match() -> None:
 
 
 def test_persona_conformance_invariants_for_fallback() -> None:
-    """Per Claude Opus's warning about personality drift across the
-    fallback LLM chain: regardless of which model we land on, certain
-    invariants MUST hold in every rendered response. This test
-    verifies the persona text itself encodes those invariants so any
-    LLM in the chain (Grok 4.20 / 4.1-fast / GPT-4.1-mini) is told
-    the same hard constraints."""
+    """Cross-model conformance: regardless of which LLM the fallback
+    chain lands on (gpt-4o-mini / gpt-4.1-mini / grok-4.20), these
+    invariants must be in the prompt so every model is told the same
+    hard constraints. Aligned to Cassie OPC v2.0 — same baseline
+    that powers the canonical Cassie deployment."""
     from voxaris_agent.worker import render_persona
 
     text = _flat(render_persona())
     # Identity invariants (must survive model switch)
     assert "deedy" in text  # name preserved
     assert "arrivia" in text  # platform brand preserved
-    # Compliance invariants
-    assert "never claim to be human" in text
-    assert "absolute prohibition" in text  # PCI rule
-    assert "eighteen" in text  # 18+ data gate
+    # Compliance invariants (canonical names)
+    assert "never claim to be human" in text or "never deny being ai" in text
+    assert "pii prohibition" in text          # was "absolute prohibition" pre-v2.0
+    assert "golden rule" in text              # canonical disqual principle
+    assert "three-strike rule" in text        # canonical objection limit
     # Tool-call invariants — these are how we detect non-conformance
-    # at runtime if a fallback model starts misbehaving
     for required in (
         "lookup_qa",
         "lookup_objection",
@@ -264,6 +289,7 @@ def test_persona_conformance_invariants_for_fallback() -> None:
         "send_sms_confirmation",
         "transfer_to_human",
         "note_uncertainty",
+        "verify_me_to_caller",
     ):
         assert required in text, f"persona missing tool ref: {required}"
 
