@@ -48,6 +48,7 @@ from livekit.agents import (
     Agent,
     AgentSession,
     JobContext,
+    JobProcess,
     RoomInputOptions,
     TurnHandlingOptions,
     WorkerOptions,
@@ -1609,7 +1610,11 @@ async def entrypoint(ctx: JobContext) -> None:
             [primary_tts, fallback_tts_rime_mistv3, fallback_tts_arcana],
             max_retry_per_tts=1,
         ),
-        vad=silero.VAD.load(),
+        # VAD is pre-loaded in prewarm() and cached on the JobProcess
+        # userdata. Loading silero.VAD inline here would re-pay the
+        # ~200-500ms ONNX load cost on every cold-started call. Pattern
+        # from livekit-examples/agent-starter-python.
+        vad=ctx.proc.userdata["vad"],
         turn_handling=TurnHandlingOptions(turn_detection="stt"),
         ivr_detection=True,
         allow_interruptions=True,
@@ -1710,6 +1715,19 @@ async def entrypoint(ctx: JobContext) -> None:
         )
 
 
+def prewarm(proc: JobProcess) -> None:
+    """Process-startup hook — load expensive models once per worker.
+
+    Called by LiveKit before the worker accepts any dispatches. The
+    cached values are reused across every call this process handles,
+    so we skip the ~200-500ms ONNX/Silero load on every cold call.
+
+    Pattern from livekit-examples/agent-starter-python and
+    livekit-examples/cartesia-voice-agent.
+    """
+    proc.userdata["vad"] = silero.VAD.load()
+
+
 def cli_main() -> None:
     """Console entrypoint exposed as `andie-worker`.
 
@@ -1721,6 +1739,7 @@ def cli_main() -> None:
     agents.cli.run_app(
         WorkerOptions(
             entrypoint_fnc=entrypoint,
+            prewarm_fnc=prewarm,
             agent_name="andie-gvr",
             port=8082,
             # See Deedy's worker.py for the full rationale. tldr:
