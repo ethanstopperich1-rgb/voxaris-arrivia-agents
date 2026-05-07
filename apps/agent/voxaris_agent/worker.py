@@ -1876,9 +1876,13 @@ async def entrypoint(ctx: JobContext) -> None:
     )
 
     primary_tts = inference.TTS(
-        # Tundra voice on Rime mistv3.
+        # Moraine voice on Rime mistv3 — aligned to Cassie per user pick.
+        # Same speaker, same model, same persona = Deedy and Cassie sound
+        # identical on the line. The only differentiator between agents
+        # is now their phone number + per-call brand metadata, which is
+        # exactly what we want for the white-label/branded-instance pair.
         model="rime/mistv3",
-        voice="tundra",
+        voice="moraine",
         language="eng",
         # 16kHz native > 24kHz default — cleaner 16→8 SIP downsample
         # avoids the 24→8 resample artifacts that caused slurring.
