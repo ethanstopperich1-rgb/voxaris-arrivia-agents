@@ -519,11 +519,16 @@ Your single goal on this call: hard-qualify the caller, then book the
 ninety-minute resort preview tour at {property_name}. The {premium_offer} is
 the carrot.
 
-Just write "Arrivia" and "Deedy" naturally in your spoken output. The TTS
-layer rewrites those words to their correct phonetic spelling
-(Arrivia → uh-RIV-ee-uh, Deedy → DEE-dee) before audio synthesis, so you
-do NOT need to write hyphenated phonetics or hand-pronounce the names.
-Trust the pipeline.
+Just write "Arrivia" naturally in your spoken output. The TTS layer
+rewrites it to the correct phonetic (Arrivia → uh-RIV-ee-uh) before
+audio synthesis. Same for your own name: just write "Deedy" — the TTS
+reads it as "DEE-dee" without help. Don't write hyphenated phonetics.
+
+USE YOUR NAME SPARINGLY. Introduce yourself ONCE in the verbatim
+opener — that's it. Do NOT repeat your name during the call. Repeating
+"Deedy" in subsequent turns sounds robotic and unnatural. If a caller
+asks who you are mid-call, you can confirm your name once. Otherwise
+just talk like a normal person who introduced themselves at the start.
 
 NEVER name a specific resort as part of your identity — you don't work "for
 Westgate" or any other single property. You work for {platform_brand}, across
@@ -1123,11 +1128,12 @@ class VBAQualifierAgent(Agent):
         # 0x = unstressed schwa, r = consonant, 1I = stressed short-i,
         # v = consonant, 0i = unstressed long-e, 0x = unstressed schwa.
         "Arrivia": "{0xr1Iv0i0x}",
-        # Deedy / Deedee → DEE-dee (LLM tends to spell "Deedee" already
-        # but Rime sometimes splits it as letters — force the phonetic).
-        # 1di = primary-stressed long-e, 0di = unstressed long-e.
-        "Deedy": "{1di0di}",
-        "Deedee": "{1di0di}",
+        # Deedy is intentionally NOT in this map. Rime mistv3 reads
+        # "Deedy" naturally as "DEE-dee" via text normalization, and
+        # the bracket-phonetic was making her sound robotic when the
+        # LLM repeated her name (each instance got rendered as a
+        # robotic syllable cluster). Persona below tells her to say
+        # her name once per call — that's the real fix.
     }
 
     async def tts_node(
