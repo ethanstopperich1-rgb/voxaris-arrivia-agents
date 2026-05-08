@@ -31,6 +31,9 @@ os.environ.setdefault("ORT_INTRA_OP_NUM_THREADS", "1")
 os.environ.setdefault("ORT_INTER_OP_NUM_THREADS", "1")
 
 from dotenv import load_dotenv
+import re
+from typing import AsyncIterable
+
 from livekit import agents
 from livekit.agents import (
     Agent,
@@ -44,6 +47,7 @@ from livekit.agents import (
 from livekit import api, rtc
 from livekit.agents import TurnHandlingOptions
 from livekit.agents.llm import function_tool
+from livekit.agents.voice import ModelSettings
 from livekit.plugins import noise_cancellation, silero
 
 from voxaris_agent.objections import match_objection, render_rebuttal
@@ -447,22 +451,25 @@ _LLM_FORBIDDEN_CTX_KEYS: frozenset[str] = frozenset({
 # being handed to the model. Curly braces elsewhere in the prompt MUST be
 # doubled (`{{`, `}}`) — they aren't, so don't add any.
 
-# Direction-aware greetings. Spell "Deedy" phonetically as "Deedee" in
-# the speech text so Rime mistv3 doesn't read it letter-by-letter
-# (D-E-E-D-Y). The agent's canonical name is still Deedy.
+# Direction-aware greetings.
+#
+# Both "Deedy" (the agent's name) and "Arrivia" (the brand) get
+# rewritten to Rime's bracket-phonetic syntax via the tts_node on
+# VBAQualifierAgent — see _PRONUNCIATIONS map. The LLM writes those
+# words naturally; the audio comes out correct. Don't put hyphenated
+# phonetics here anymore — Rime reads them literally without the
+# bracket parser.
 
 GREETING_INSTRUCTIONS_INBOUND_TEMPLATE = (
     "The caller dialed in (INBOUND). Open with the canonical Arrivia "
     "disclosure VERBATIM, names the offer (per Cassie OPC v2.0 — caller "
-    "scanned a QR or dialed for the offer; skip fishing). Pronounce "
-    "your own name as Deedee (NOT letter-by-letter). Pronounce "
-    "Arrivia as \"uh-RIV-ee-uh\". Do NOT name a specific resort in "
-    "the opener — Arrivia is the brand, {property_name} is just where "
-    "the caller is right now. "
-    "Say EXACTLY: \"Hi, this is Deedee — I'm a virtual booking agent "
-    "with uh-RIV-ee-uh. This call may be recorded for quality and "
-    "assurance purposes. I see you're interested in claiming your "
-    "{premium_offer} — got a quick minute?\" "
+    "scanned a QR or dialed for the offer; skip fishing). Do NOT name a "
+    "specific resort in the opener — Arrivia is the brand, {property_name} "
+    "is just where the caller is right now. "
+    "Say EXACTLY: \"Hi, this is Deedy — I'm a virtual booking agent "
+    "with Arrivia. This call may be recorded for quality and assurance "
+    "purposes. I see you're interested in claiming your {premium_offer} "
+    "— got a quick minute?\" "
     "Then WAIT. If they say yes → PHASE 2 (rapport / on-property gate). "
     "If they ask what the offer is → brief warm explanation, then PHASE 2. "
     "Recording objection → graceful end. Wrong number / scanned by "
@@ -471,13 +478,11 @@ GREETING_INSTRUCTIONS_INBOUND_TEMPLATE = (
 
 GREETING_INSTRUCTIONS_OUTBOUND_TEMPLATE = (
     "You are calling the guest (OUTBOUND). Open with the canonical "
-    "Arrivia disclosure, names the offer. Pronounce Deedee not letters. "
-    "Pronounce Arrivia as \"uh-RIV-ee-uh\". Do NOT name a specific "
-    "resort in the opener. "
-    "Say EXACTLY: \"Hi {caller_first_name}, this is Deedee — I'm "
-    "calling on behalf of uh-RIV-ee-uh. This call may be recorded for "
-    "quality and assurance purposes. Got a quick minute about your "
-    "{premium_offer}?\" "
+    "Arrivia disclosure, names the offer. Do NOT name a specific resort "
+    "in the opener. "
+    "Say EXACTLY: \"Hi {caller_first_name}, this is Deedy — I'm calling "
+    "on behalf of Arrivia. This call may be recorded for quality and "
+    "assurance purposes. Got a quick minute about your {premium_offer}?\" "
     "Then WAIT. Yes → PHASE 2 (rapport / on-property gate). Recording "
     "objection → graceful end. DNC → graceful end."
 )
@@ -500,9 +505,9 @@ GREETING_INSTRUCTIONS_TEMPLATE = GREETING_INSTRUCTIONS_INBOUND_TEMPLATE
 
 PERSONA_INSTRUCTIONS_TEMPLATE = """
 <identity>
-You are Deedy, a virtual booking agent for {platform_brand} (pronounced
-"{platform_brand_phonetic}"). You are an AI — smart software, not a human.
-You disclose this in the verbatim opener and confirm it any time a caller asks.
+You are Deedy, a virtual booking agent for {platform_brand}. You are an
+AI — smart software, not a human. You disclose this in the verbatim
+opener and confirm it any time a caller asks.
 
 YOU ARE THE SPECIALIST. You hard-qualify the caller and you book the tour on
 this call. There is no human you transfer to for booking — you ARE the booking
@@ -514,10 +519,11 @@ Your single goal on this call: hard-qualify the caller, then book the
 ninety-minute resort preview tour at {property_name}. The {premium_offer} is
 the carrot.
 
-Pronounce your name as "Deedee" (two syllables). Pronounce {platform_brand}
-phonetically as "{platform_brand_phonetic}" — the TTS mangles the literal
-spelling. Write the phonetic form in your spoken output so the engine reads
-it correctly.
+Just write "Arrivia" and "Deedy" naturally in your spoken output. The TTS
+layer rewrites those words to their correct phonetic spelling
+(Arrivia → uh-RIV-ee-uh, Deedy → DEE-dee) before audio synthesis, so you
+do NOT need to write hyphenated phonetics or hand-pronounce the names.
+Trust the pipeline.
 
 NEVER name a specific resort as part of your identity — you don't work "for
 Westgate" or any other single property. You work for {platform_brand}, across
@@ -1094,6 +1100,63 @@ class VBAQualifierAgent(Agent):
         self._escalation["qa_no_match_streak"] = 0
         self._escalation["uncertainty_streak"] = 0
         self._escalation["repeat_question_streak"] = 0
+
+    # ─────────────────────────────────────────────────────────────────
+    # Pronunciation overrides — applied via tts_node before audio synth.
+    # The LLM writes natural English ("Arrivia"); this layer rewrites
+    # those tokens into Rime's bracket-phonetic syntax so the audio
+    # comes out correct regardless of what the LLM emits.
+    #
+    # Rime mistv3 phonetic alphabet (per docs.rime.ai/api-reference/
+    # custom-pronunciation): vowels include x="comma" (schwa),
+    # I="bit" (short i), i="beat" (long e). Stress prefix: 1=primary,
+    # 2=secondary, 0=unstressed. Syllable boundaries are implicit.
+    #
+    # Requires phonemize_between_brackets=True on the active TTS,
+    # which is set on primary_tts above. Fallbacks (rime/arcana,
+    # cartesia/sonic-2) don't support that flag — if the chain fails
+    # over mid-call those TTSs will read the brackets literally,
+    # accepted as a known degraded state since fallback is rare.
+    # ─────────────────────────────────────────────────────────────────
+    _PRONUNCIATIONS = {
+        # Arrivia → uh-RIV-ee-uh (4 syllables, primary stress on RIV)
+        # 0x = unstressed schwa, r = consonant, 1I = stressed short-i,
+        # v = consonant, 0i = unstressed long-e, 0x = unstressed schwa.
+        "Arrivia": "{0xr1Iv0i0x}",
+        # Deedy / Deedee → DEE-dee (LLM tends to spell "Deedee" already
+        # but Rime sometimes splits it as letters — force the phonetic).
+        # 1di = primary-stressed long-e, 0di = unstressed long-e.
+        "Deedy": "{1di0di}",
+        "Deedee": "{1di0di}",
+    }
+
+    async def tts_node(
+        self,
+        text: AsyncIterable[str],
+        model_settings: ModelSettings,
+    ) -> AsyncIterable[rtc.AudioFrame]:
+        """Rewrite specific words to Rime's bracket-phonetic syntax
+        before they hit TTS. Word-boundary regex prevents partial
+        matches (e.g., "Deedy's" doesn't get clobbered)."""
+
+        async def _rewrite(stream: AsyncIterable[str]) -> AsyncIterable[str]:
+            async for chunk in stream:
+                rewritten = chunk
+                for word, phonetic in self._PRONUNCIATIONS.items():
+                    rewritten = re.sub(
+                        rf"\b{re.escape(word)}\b",
+                        phonetic,
+                        rewritten,
+                        flags=re.IGNORECASE,
+                    )
+                yield rewritten
+
+        async for frame in Agent.default.tts_node(
+            self,
+            _rewrite(text),
+            model_settings,
+        ):
+            yield frame
 
     @function_tool(
         name="opc_book",
@@ -1889,7 +1952,12 @@ async def entrypoint(ctx: JobContext) -> None:
         sample_rate=16000,
         # speed_alpha 1.0 = Rime's native default pace. No slowdown
         # applied. Tweak only if PSTN tests show pacing issues.
-        extra_kwargs={"speed_alpha": 1.0},
+        # phonemize_between_brackets=True enables Rime's custom-pronunciation
+        # syntax inside curly braces (e.g., "{0xr1Iv0i0x}" forces the
+        # correct UH-RIV-EE-UH pronunciation of Arrivia). Required by the
+        # tts_node interceptor on DeedyAgent. Verified per Rime docs:
+        # docs.rime.ai/api-reference/custom-pronunciation
+        extra_kwargs={"speed_alpha": 1.0, "phonemize_between_brackets": True},
     )
     # Rime arcana = same provider, different model family. If
     # Rime is fully down we fall through to Cartesia (different

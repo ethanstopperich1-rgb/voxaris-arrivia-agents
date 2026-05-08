@@ -177,10 +177,14 @@ def test_inbound_greeting_uses_canonical_opener() -> None:
     from voxaris_agent.worker import render_greeting
 
     inbound = render_greeting({"direction": "inbound"}).lower()
-    # Canonical v2.0 opener wording
-    assert "deedee" in inbound
+    # Canonical v2.0 opener wording. "Deedy" and "Arrivia" now pass
+    # through to the tts_node which rewrites them to the Rime
+    # bracket-phonetic ({1di0di} and {0xr1Iv0i0x}) before audio
+    # synthesis — so the LLM-facing instruction text just uses the
+    # natural English spellings now.
+    assert "deedy" in inbound or "deedee" in inbound
+    assert "arrivia" in inbound
     assert "virtual booking agent" in inbound
-    assert "uh-riv-ee-uh" in inbound
     # Names the offer hook (v2.0 critical change — caller already knows
     # they want it; skip fishing)
     assert "claiming your" in inbound or "interested in" in inbound
