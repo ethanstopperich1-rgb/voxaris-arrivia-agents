@@ -48,7 +48,7 @@ from livekit import api, rtc
 from livekit.agents import TurnHandlingOptions
 from livekit.agents.llm import function_tool
 from livekit.agents.voice import ModelSettings
-from livekit.plugins import noise_cancellation, silero
+from livekit.plugins import ai_coustics, noise_cancellation, silero  # noqa: F401  (noise_cancellation kept for backward-compat imports elsewhere)
 
 from voxaris_agent.objections import match_objection, render_rebuttal
 from voxaris_agent.qa import match_qa
@@ -2108,7 +2108,15 @@ async def entrypoint(ctx: JobContext) -> None:
         agent=VBAQualifierAgent(guest_context=guest_ctx),
         room=ctx.room,
         room_input_options=RoomInputOptions(
-            noise_cancellation=noise_cancellation.BVCTelephony(),
+            # Upgraded 2026-05-11 from Krisp BVCTelephony() to ai-coustics
+            # QUAIL_VF_L. Per LK docs (transport/media/noise-cancellation),
+            # QUAIL_VF_L hits 11.8% WER vs Krisp BVC's 23.5% on agent
+            # pipelines. Caller-side voice isolation — strips ambient
+            # noise + cross-talk before Deedy's STT sees it, so callers
+            # don't have to manually mute between turns.
+            noise_cancellation=ai_coustics.audio_enhancement(
+                model=ai_coustics.EnhancerModel.QUAIL_VF_L,
+            ),
         ),
     )
 
