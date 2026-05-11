@@ -492,6 +492,51 @@ GREETING_INSTRUCTIONS_TEMPLATE = GREETING_INSTRUCTIONS_INBOUND_TEMPLATE
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# VERBATIM OPENERS — played via session.say(), NO LLM ROUND-TRIP.
+#
+# Why this exists: session.generate_reply(instructions=...) on the first turn
+# forces a full LLM completion before TTS gets a single token. With cold-start
+# on Render-starter + LLM TTFT + full-completion + TTS TTFB, that's ~5-10s
+# before the caller hears anything. Cassie uses the verbatim-say pattern and
+# starts speaking in ~1s. Mirroring her pattern here.
+#
+# Pronunciation: "uh-RIV-ee-uh" is written phonetically with dashes so
+# Rime mistv3 reads it as 4 syllables. Do NOT use bracket-phonetic syntax
+# here — phonemize_between_brackets is not supported on mistv3 and would
+# break TTS again (see 2026-05-11 silence regression).
+# ─────────────────────────────────────────────────────────────────────────────
+
+OPENER_INBOUND_VERBATIM_TEMPLATE = (
+    "Hi, this is Deedy — I'm a virtual booking agent with uh-RIV-ee-uh. "
+    "This call may be recorded for quality and assurance purposes. "
+    "I see you're interested in claiming your {premium_offer} — "
+    "got a quick minute?"
+)
+
+OPENER_OUTBOUND_VERBATIM_TEMPLATE = (
+    "Hi {caller_first_name}, this is Deedy — I'm calling on behalf of "
+    "uh-RIV-ee-uh. This call may be recorded for quality and assurance "
+    "purposes. Got a quick minute about your {premium_offer}?"
+)
+
+
+def render_opener(ctx: dict[str, str] | None = None, direction: str = "inbound") -> str:
+    """Render the verbatim opener — substitutes caller / offer fields,
+    returns the spoken-text string ready for session.say()."""
+    safe = _safe_llm_ctx(ctx) if ctx else _safe_llm_ctx({})
+    template = (
+        OPENER_OUTBOUND_VERBATIM_TEMPLATE
+        if direction == "outbound"
+        else OPENER_INBOUND_VERBATIM_TEMPLATE
+    )
+    first_name = (safe.get("caller_first_name") or "").strip() or "there"
+    return template.format(
+        caller_first_name=first_name,
+        premium_offer=safe.get("premium_offer", "your offer"),
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # PERSONA — white-labeled port of Cassie OPC Script v2.0 (Stacey, May 2026).
 # Cassie's canonical 5-phase booking flow, brand-agnostic so it works across
 # any Arrivia partner resort. Per-call substitution: {platform_brand},
@@ -1860,11 +1905,18 @@ async def entrypoint(ctx: JobContext) -> None:
         model="deepgram/flux-general",
         language="en",
         extra_kwargs={
-            # 0.7 / 0.9 / 2000ms — less eager than the default 0.4
-            # to prevent mid-sentence cutoffs.
-            "eager_eot_threshold": 0.7,
-            "eot_threshold": 0.9,
-            "eot_timeout_ms": 2000,
+            # Tightened 2026-05-11 from 0.7/0.9/2000ms → 0.4/0.6/500ms
+            # to match Cassie's inbound-concierge tuning. The prior
+            # values (Andie's outbound rambling-caller tuning) made
+            # Deedy wait a FULL 2 SECONDS after the caller stopped
+            # talking before deciding their turn was over — compounded
+            # with LLM TTFT, the perceived gap between caller and
+            # Deedy speaking was ~2.8s ("her pausing is terrible").
+            # Inbound vacation/QR-scan callers don't ramble; tighter
+            # EOT removes the dramatic pause without cutting them off.
+            "eager_eot_threshold": 0.4,
+            "eot_threshold": 0.6,
+            "eot_timeout_ms": 500,
         },
     )
     # Deepgram Nova-3 as STT fallback — different model family,
@@ -2040,7 +2092,15 @@ async def entrypoint(ctx: JobContext) -> None:
     # avoids the "greeting plays into ringback" trap. The caller
     # consented to an AI call on the QR page and is expecting the
     # disclosure in the first 10 seconds (FCC PEWC requirement).
-    await session.generate_reply(instructions=render_greeting(guest_ctx))
+    #
+    # VERBATIM via session.say() — NOT session.generate_reply(). Bypasses
+    # the LLM round-trip on the first turn (saves ~2-3s of TTFT + full
+    # completion latency that made the prior implementation feel like
+    # Deedy was taking 10s to start speaking on cold-start). Cassie uses
+    # the same pattern. The LLM still sees the greeting instructions in
+    # the persona context, so subsequent turns are informed.
+    opener = render_opener(guest_ctx, direction=guest_ctx.get("direction", "inbound"))
+    await session.say(opener, allow_interruptions=True)
 
 
 def cli_main() -> None:
