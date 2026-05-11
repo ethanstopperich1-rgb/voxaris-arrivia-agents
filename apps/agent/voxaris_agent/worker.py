@@ -1783,6 +1783,18 @@ class VBAQualifierAgent(Agent):
         }
 
 
+def prewarm(proc: "agents.JobProcess") -> None:
+    """Prewarm hook — runs ONCE per worker process at startup.
+
+    Loads silero VAD into JobProcess.userdata so every subsequent call
+    on this process can reuse it. Without this, the entrypoint pays
+    a 200-500ms ONNX load tax on EVERY incoming call. Pattern from
+    Andie + Cassie (matches livekit-examples/agent-starter-python).
+    """
+    proc.userdata["vad"] = silero.VAD.load()
+    logger.info("deedy worker prewarmed: silero VAD loaded")
+
+
 async def entrypoint(ctx: JobContext) -> None:
     """Entrypoint for the named agent dispatch.
 
@@ -2017,10 +2029,22 @@ async def entrypoint(ctx: JobContext) -> None:
             [primary_tts, fallback_tts_arcana, fallback_tts_cartesia],
             max_retry_per_tts=1,
         ),
-        vad=silero.VAD.load(),
+        # VAD prewarmed once per JobProcess in prewarm() — saves ~200-500ms
+        # ONNX-load tax per call. Inline silero.VAD.load() was hot-loading
+        # the model on every dispatch. Aligned with Andie + Cassie.
+        vad=ctx.proc.userdata["vad"],
         # Flux semantic turn detection — accounts for what the caller
         # said, not just pause length.
         turn_handling=TurnHandlingOptions(turn_detection="stt"),
+        # ─── Latency optimizations aligned with Andie's prod config ──────
+        # preemptive_generation: LLM starts generating BEFORE the user's
+        # EOT fires. Response is mostly ready by the time STT confirms
+        # turn-end. Bigger perceived-latency win than any single STT/TTS
+        # tweak. Standard in livekit-examples/agent-starter-python.
+        preemptive_generation=True,
+        # Word-level transcript timing for the dashboard live view —
+        # free perf win for ops visibility, zero latency cost.
+        use_tts_aligned_transcript=True,
         # Detect voicemail / IVR and exit cleanly instead of running
         # the qualification flow against an answering machine.
         ivr_detection=True,
@@ -2125,6 +2149,7 @@ def cli_main() -> None:
     agents.cli.run_app(
         WorkerOptions(
             entrypoint_fnc=entrypoint,
+            prewarm_fnc=prewarm,
             agent_name="deedy-vba",
             # Prewarm/spawn-time tuning for cgroup-throttled hosts
             # (Render Standard, Fly shared-cpu-1x, etc). Default
