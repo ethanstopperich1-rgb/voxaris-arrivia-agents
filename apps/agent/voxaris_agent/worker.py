@@ -1107,62 +1107,23 @@ class VBAQualifierAgent(Agent):
         self._escalation["repeat_question_streak"] = 0
 
     # ─────────────────────────────────────────────────────────────────
-    # Pronunciation overrides — applied via tts_node before audio synth.
-    # The LLM writes natural English ("Arrivia"); this layer rewrites
-    # those tokens into Rime's bracket-phonetic syntax so the audio
-    # comes out correct regardless of what the LLM emits.
+    # Pronunciation handling — REMOVED 2026-05-11.
     #
-    # Rime mistv3 phonetic alphabet (per docs.rime.ai/api-reference/
-    # custom-pronunciation): vowels include x="comma" (schwa),
-    # I="bit" (short i), i="beat" (long e). Stress prefix: 1=primary,
-    # 2=secondary, 0=unstressed. Syllable boundaries are implicit.
+    # Previously, this class injected a tts_node interceptor that
+    # rewrote "Arrivia" to Rime's bracket-phonetic "{0xr1Iv0i0x}" and
+    # relied on phonemize_between_brackets=True on the primary TTS.
+    # That flag is documented for `mist`/`mistv2` only, NOT `mistv3`
+    # (which is what Deedy uses). Result: TTS request was effectively
+    # broken — agent answered phone but emitted no audio. The fallback
+    # chain was also poisoned because the bracket syntax wasn't valid
+    # for arcana/cartesia either.
     #
-    # Requires phonemize_between_brackets=True on the active TTS,
-    # which is set on primary_tts above. Fallbacks (rime/arcana,
-    # cartesia/sonic-2) don't support that flag — if the chain fails
-    # over mid-call those TTSs will read the brackets literally,
-    # accepted as a known degraded state since fallback is rare.
+    # New approach: pronunciation handled persona-side. The LLM is
+    # instructed to write {platform_brand_phonetic} ("uh-RIV-ee-uh")
+    # in spoken output instead of "Arrivia". Rime mistv3 then reads
+    # the dashed phonetic form correctly — same pattern Andie has
+    # used in production for months.
     # ─────────────────────────────────────────────────────────────────
-    _PRONUNCIATIONS = {
-        # Arrivia → uh-RIV-ee-uh (4 syllables, primary stress on RIV)
-        # 0x = unstressed schwa, r = consonant, 1I = stressed short-i,
-        # v = consonant, 0i = unstressed long-e, 0x = unstressed schwa.
-        "Arrivia": "{0xr1Iv0i0x}",
-        # Deedy is intentionally NOT in this map. Rime mistv3 reads
-        # "Deedy" naturally as "DEE-dee" via text normalization, and
-        # the bracket-phonetic was making her sound robotic when the
-        # LLM repeated her name (each instance got rendered as a
-        # robotic syllable cluster). Persona below tells her to say
-        # her name once per call — that's the real fix.
-    }
-
-    async def tts_node(
-        self,
-        text: AsyncIterable[str],
-        model_settings: ModelSettings,
-    ) -> AsyncIterable[rtc.AudioFrame]:
-        """Rewrite specific words to Rime's bracket-phonetic syntax
-        before they hit TTS. Word-boundary regex prevents partial
-        matches (e.g., "Deedy's" doesn't get clobbered)."""
-
-        async def _rewrite(stream: AsyncIterable[str]) -> AsyncIterable[str]:
-            async for chunk in stream:
-                rewritten = chunk
-                for word, phonetic in self._PRONUNCIATIONS.items():
-                    rewritten = re.sub(
-                        rf"\b{re.escape(word)}\b",
-                        phonetic,
-                        rewritten,
-                        flags=re.IGNORECASE,
-                    )
-                yield rewritten
-
-        async for frame in Agent.default.tts_node(
-            self,
-            _rewrite(text),
-            model_settings,
-        ):
-            yield frame
 
     @function_tool(
         name="opc_book",
@@ -1947,23 +1908,28 @@ async def entrypoint(ctx: JobContext) -> None:
     primary_tts = inference.TTS(
         # Moraine voice on Rime mistv3 — aligned to Cassie per user pick.
         # Same speaker, same model, same persona = Deedy and Cassie sound
-        # identical on the line. The only differentiator between agents
-        # is now their phone number + per-call brand metadata, which is
-        # exactly what we want for the white-label/branded-instance pair.
+        # identical on the line.
+        #
+        # DO NOT add phonemize_between_brackets here. Per docs.livekit.io/
+        # agents/models/tts/rime/ that flag is documented for `mist` and
+        # `mistv2` only — `mistv3` doesn't honor it, AND the fallbacks
+        # (rime/arcana, cartesia/sonic-2) don't support phonemize at all,
+        # so the bracket-phonetic syntax poisons the entire chain. Symptom
+        # was silent audio on inbound calls (Deedy answered but said
+        # nothing). Removed 2026-05-11.
+        #
+        # Pronunciation override for "Arrivia" → "uh-RIV-ee-uh" is now
+        # handled persona-side (the LLM writes the phonetic form in
+        # spoken output) — see {platform_brand_phonetic} in the
+        # conversational_flow block.
         model="rime/mistv3",
         voice="moraine",
         language="eng",
         # 16kHz native > 24kHz default — cleaner 16→8 SIP downsample
         # avoids the 24→8 resample artifacts that caused slurring.
         sample_rate=16000,
-        # speed_alpha 1.0 = Rime's native default pace. No slowdown
-        # applied. Tweak only if PSTN tests show pacing issues.
-        # phonemize_between_brackets=True enables Rime's custom-pronunciation
-        # syntax inside curly braces (e.g., "{0xr1Iv0i0x}" forces the
-        # correct UH-RIV-EE-UH pronunciation of Arrivia). Required by the
-        # tts_node interceptor on DeedyAgent. Verified per Rime docs:
-        # docs.rime.ai/api-reference/custom-pronunciation
-        extra_kwargs={"speed_alpha": 1.0, "phonemize_between_brackets": True},
+        # speed_alpha 1.0 = Rime's native default pace.
+        extra_kwargs={"speed_alpha": 1.0},
     )
     # Rime arcana = same provider, different model family. If
     # Rime is fully down we fall through to Cartesia (different
